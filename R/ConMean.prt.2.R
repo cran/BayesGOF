@@ -1,4 +1,4 @@
-PP.prt.2 <-
+ConMean.prt.2 <-
 function(c.vec, weight, leg.mat, u, par1, par2){
 	#### theta is G inv u = qnorm(u,muhat,tauhat)
 	inner.part <- qbeta(u, par1, par2)*leg.mat

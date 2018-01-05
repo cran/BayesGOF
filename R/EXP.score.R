@@ -5,4 +5,4 @@ function(u, LP.par, weight.vec, leg.mat){
 						EXP.num.2(LP.par, weight.vec, leg.mat) ) / 
 						EXP.denom(LP.par, weight.vec, leg.mat)
 			return(vec.map)
-}	
+}

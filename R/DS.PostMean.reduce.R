@@ -13,7 +13,7 @@ function(DS.GF.obj){
 		B <- dim(DS.GF.obj$prior.data)[1]
 		u <- seq(1/B,1-(1/B), length.out = B) ##unit interval, 0 to 1
 		ConMean.vec <- NULL
-		ConMean.vec <- apply(DS.GF.obj$obs.data, 1, function(x) DS.PostMean(x[1], x[2], DS.GF.obj$g.par, u, DS.GF.obj$LP.par, method = "Theta"))
+		ConMean.vec <- apply(DS.GF.obj$obs.data, 1, function(x) DS.PostMean(x[1], x[2], DS.GF.obj$g.par, u, DS.GF.obj$LP.par))
 	}
 	return(ConMean.vec)
 }

@@ -7,10 +7,10 @@ function(x, ...){
 		}
 	if(dim(x$prior.data)[2] == 3){
 		par(mar=c(5,5,4,2)+0.3) #changes left margin to make large labels fit
-		plot(x$prior.data$theta.vals, x$prior.data$ds.prior, xlim = c(0,1), 
+		plot(x$prior.data$theta.vals, x$prior.data$ds.prior, 
 			main = "MacroInference: Modes", type = "l", yaxs = "i", lwd = 2, col = "red3",
 			xlab = expression(theta), ylab = "", font.main = 1,
-			cex.lab=1.45, cex.axis=1.5, cex.main=2, cex.sub=1.5)
+			cex.lab=1.45, cex.axis=1.5, cex.main=2, cex.sub=1.5, ...)
 		title(ylab = expression(paste(hat(pi)(theta))), line = 2.3, cex.lab=1.45)
 		points(x$model.modes, rep(0, length(x$model.modes)), col = "green", pch = 17, cex = 1.5)
 		for(i in 1:length(x$model.modes)){
@@ -19,10 +19,10 @@ function(x, ...){
 			}
 		} else {
 		par(mar=c(5,5,4,2)+0.3) #changes left margin to make large labels fit
-		plot(x$prior.data$theta.vals, x$prior.data$parm.prior, xlim = c(0,1), 
+		plot(x$prior.data$theta.vals, x$prior.data$parm.prior, 
 			main = "MacroInference: Modes", type = "l", yaxs = "i", lwd = 2, col = "red3",
 			xlab = expression(theta), ylab = "", font.main = 1,
-			cex.lab=1.45, cex.axis=1.5, cex.main=2, cex.sub=1.5)
+			cex.lab=1.45, cex.axis=1.5, cex.main=2, cex.sub=1.5, ...)
 		title(ylab = expression(paste(hat(pi)(theta))), line = 2.3, cex.lab=1.45)
 		points(x$model.modes, rep(0, length(x$model.modes)), col = "green", pch = 17, cex = 1.5)
 		for(i in 1:length(x$model.modes)){

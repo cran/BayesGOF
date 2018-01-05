@@ -1,0 +1,71 @@
+---
+title: "Bayes via Goodness of Fit"
+author: Subhadeep Mukhopadhyay and Douglas Fletcher
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Bayes via Goodness of Fit}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+##Illustration Using Rat Tumor Data
+The rat tumor data consists of observations of endometrial stromal polyp incidence in $k=71$ groups of rats.  For each group, $y_i$ is the number of rats with polyps and $n_i$ is the total number of rats in the experiment.  Here we describe the analysis of Rat tumor data using Bayes-${\rm DS}(G,m)$ modeling.  
+
+**Step 1.** We begin by finding the starting parameter values for $g \sim Beta(\alpha, \beta)$ by MLE:
+
+```{r, message  = FALSE}
+library(BayesGOF)
+set.seed(8697)
+data(rat)
+###Use MLE to determine starting values
+rat.start <- BetaBinoMLE(rat$y, rat$n)$estimate
+```
+We use our starting parameter values to run the main DS.prior function:
+
+```{r}
+rat.ds <- DS.prior(rat, max.m = 6, rat.start)
+```
+**Step 2.** We display the U-function to quantify and characterize the uncertainty of the a priori selected $g$:
+```{r, fig.height = 5.5, fig.width = 5.5, fig.align = 'center'}
+plot(rat.ds, plot.type = "Ufunc")
+```
+The deviations from the uniform distribution (the red dashed line) indicates that our initial selection for $g$, $\text{Beta}(\alpha = 2.3,\beta = 14.1)$, is incompatible with the observed data and requires repair; the data indicate that there are, in fact, two different groups of incidence in the rats.  
+
+**Step 3a.** Extract the parameters for the *corrected* prior $\hat{\pi}$:
+```{r}
+rat.ds
+```
+Therefore, the DS prior $\hat{\pi}$ given $g$ is: $$\hat{\pi}(\theta) = g(\theta; \alpha,\beta)\Big[1 - 0.52T_3(\theta;G) \Big]$$
+
+**Step 3b.** We can now plot the estimated DS prior $\hat{\pi}$ along with the original parametric $g$:
+```{r,fig.height = 5.5, fig.width = 5.5,fig.align = 'center'}
+plot(rat.ds, plot.type = "DSg")
+```
+
+###MacroInference
+
+**Step 4.** Here we are interested in the *overall* macro-level inference by combining the $k=70$ parallel studies. The following code 
+indicates the existence of two distinct groups of $\theta_i$'s.  The group-specific modes along with their SEs can be computed as folows:
+```{r, warning = FALSE}
+rat.macro.md <- DS.macro.inf(rat.ds, num.modes = 2 , iters = 25, method = "mode") 
+```
+```{r}
+rat.macro.md
+```
+```{r, fig.height = 5.5, fig.width = 5.5,fig.align = 'center'}
+
+plot(rat.macro.md)
+```
+
+###MicroInference
+
+**Step 5.** Given an additional study $\theta_{71}$ where $y_{71} = 4$ and $n_{71} = 14$, the goal is to estimate the probability of a tumor for this new clinical study. The following code performs the desired microinference (posterior distribution along with its mean and mode):
+
+```{r, fig.align = 'center'}
+rat.y71.micro <- DS.micro.inf(rat.ds, y.i = 4, n.i = 14)
+rat.y71.micro
+```
+```{r,fig.height = 5.5, fig.width = 5.5,fig.align = 'center' }
+plot(rat.y71.micro)
+```
+

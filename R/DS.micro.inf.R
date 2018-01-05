@@ -2,34 +2,31 @@ DS.micro.inf <-
 function(DS.GF.obj, y.i, n.i){
 #####################################################
 # INPUTS
-#  y.0			number of successes in sample
-#  n.0			number of total trials in sample
+#  y.i			number of successes in new study
+#  n.i			number of total trials in new study
 #  DS.GF.obj		AutoBayes-DataCorrect object
 # OUTPUTS
 		out <- list()
-		alpha_0 <- DS.GF.obj$g.par[1]
-		beta_0 <- DS.GF.obj$g.par[2]
-		c.vec <- DS.GF.obj$LP.par
-		post.alph.i <- y.i + alpha_0
-		post.beta.i <- n.i - y.i + beta_0
-		##calculate denominator/standardization constant
+		#find posterior parameters
+		post.alph.i <- y.i + DS.GF.obj$g.par[1]
+		post.beta.i <- n.i - y.i + DS.GF.obj$g.par[2]
+		##determine parametric density
 		B=250
 		u.int <- seq(1/B, 1-(1/B), length.out = B)
-		leg.mat.den <- LP.basis.beta(u.int, c(1,1), length(c.vec))
-		wght.den <- weight.fun.beta(u.int,alpha_0,beta_0,
-					post.alph.i,post.beta.i)
-		##Get non-standard LP adjusted density
 		eb.pos.den <- dbeta(u.int, post.alph.i, post.beta.i)
-		#u.theta <- pbeta(u.int, alpha_0, beta_0)
-		Leg.G <- LP.basis.beta(u.int, c(alpha_0, beta_0), length(c.vec))
-		nstd.dc.pos <- eb.pos.den*(1+Leg.G%*%c.vec)
-		denom <- EXP.denom(c.vec, wght.den, leg.mat.den)
-		ds.pos <- nstd.dc.pos/denom
+		##determine LP density
+		#Leg(u) for weight function
+		leg.mat.den <- LP.basis.beta(u.int, c(1,1), length(DS.GF.obj$LP.par))
+		wght.den <- weight.fun.beta(u.int, DS.GF.obj$g.par[1], DS.GF.obj$g.par[2],
+					post.alph.i,post.beta.i)
+		Leg.G <- LP.basis.beta(u.int, c(DS.GF.obj$g.par[1], DS.GF.obj$g.par[2]), length(DS.GF.obj$LP.par))
+		ds.pos <- eb.pos.den*(1+Leg.G%*%DS.GF.obj$LP.par) / EXP.denom(DS.GF.obj$LP.par, wght.den, leg.mat.den)
+		#Format output
 		out$post.data <- data.frame(theta.vals = u.int,
 									parm.pos = eb.pos.den,
 									ds.pos = ds.pos)				
 		out$post.data[out$post.data<0]<-0
-		out$post.mean <- DS.PostMean(y.i, n.i, DS.GF.obj$g.par, u.int, DS.GF.obj$LP.par, method = "Theta")
+		out$post.mean <- DS.PostMean(y.i, n.i, DS.GF.obj$g.par, u.int, DS.GF.obj$LP.par)
 		out$post.mode <- DS.mode.map(y.i, n.i, DS.GF.obj$g.par, DS.GF.obj$LP.par, B)
 		out$study <- c(y.i, n.i)
 		class(out) <- "DS_GF_micro"

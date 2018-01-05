@@ -3,8 +3,8 @@ function(yn.df, max.m = 8, start.par, iter.c = 200,
 						B = 1000, smooth.crit = "BIC"){
 ####iterates through given conditions to find c-vector
 #### INPUTS		
-#### y.i 	   		predictions for X from each of k servers
-#### n.i	   		Bi-beta: number observations per y.i
+#### yn.df 			dataframe with 1st column as predictions for X from each of k servers
+#### 		   		and second column as number observations per y.i
 #### start.par   	user-desired parameters for designated prior for beta-bin: c(alpha, beta)
 #### max.m			maximum order of legendre polynomials desired
 #### iter.c			number of iterations desired for calculating LP coefficents
@@ -40,9 +40,11 @@ function(yn.df, max.m = 8, start.par, iter.c = 200,
 		dev.m <- NULL
 		B.loop <- 150
 		u.loop <- seq(1/B.loop,1-(1/B.loop), length.out = B.loop) ##unit interval, 0 to 1
+		## Generate Posterior Values for Weight Function
 		post.alpha.i <- start.par[1] + yn.df[,1]
 		post.beta.i <- yn.df[,2] - yn.df[,1] + start.par[2]
 		post.mat <- data.frame(al = post.alpha.i, be = post.beta.i)
+		## Generate Weight Function Matrix for Conditional Expectation
 		wght.loop <- apply(post.mat, 1, function(x) weight.fun.beta(u.loop, start.par[1], start.par[2], x[1], x[2]))
 		###Determine LP coefficients
 		if(smooth.crit == "BIC"){
@@ -114,4 +116,4 @@ function(yn.df, max.m = 8, start.par, iter.c = 200,
 				 class(out) <- "DS_GF"
 				 return(out)
 				 }
-}	
+}

@@ -48,7 +48,7 @@ rat.start <- BetaBinoMLE(rat$y, rat$n)$estimate
 rat.ds <- DS.prior(rat, max.m = 4, rat.start)
 rat.ds
 plot(rat.ds, plot.type = "Ufunc")
-plot(rat.ds, plot.type = "DS_G")
+plot(rat.ds, plot.type = "DSg")
 plot(rat.ds, plot.type = "mDev")
 }
 \keyword{DS Main Functions}
