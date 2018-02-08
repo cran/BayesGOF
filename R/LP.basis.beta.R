@@ -5,7 +5,7 @@ function(x, g.par, m, ind = NULL){
 ##	x		set of values OR single value between (0,1)
 ##  g.par	Parameters for the beta parametric prior G
 ##  m		selected m value
-##  j		Extracts the jth column of matrix; ow entire matrix 
+##  ind		Extracts the individual column of matrix; ow entire matrix 
 ##	
 ## OUTPUTS
 ##  TY      functional values for the first m legendre polynomials

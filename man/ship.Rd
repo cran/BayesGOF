@@ -16,7 +16,5 @@ Data represents results of quality-control inspections executed by Portsmouth Na
   }
 }
 \source{ Martz, H. and Lian, M. (1974), "Empirical Bayes estimation of the binomial parameter," Biometrika, 61, 517-523.}
-\references{
-Sivaganesan, S. and Berger, J. (1993), "Robust Bayesian analysis of the binomial empirical Bayes problem," Canadian Journal of Statistics, 21, 107-119.
-}
+
 \keyword{datasets}

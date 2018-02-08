@@ -19,6 +19,7 @@ National Cancer Institute (1977), "Bioassay of phenformin for possible carcinoge
 }
 \references{
 Gelman, A., Carlin, J.B., Stern, H.S., Dunson, D.B., Vehtari, A., and Rubin, D.B. (2013), Baysian Data Analysis, Third Edition, Chapman & Hall/ CRC Texts in Statistical Science, Taylor & Francis.
+
 Tarone, R.E. (1982), "The use of historical control information in testing for a trend in proportions," Biometrics, 215-220.
 }
 \keyword{datasets}

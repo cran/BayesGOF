@@ -3,10 +3,10 @@ library(BayesGOF)
 set.seed(8697)
 data(rat)
 ###Use MLE to determine starting values
-rat.start <- BetaBinoMLE(rat$y, rat$n)$estimate
+rat.start <- gMLE.bb(rat$y, rat$n)$estimate
 
 ## ------------------------------------------------------------------------
-rat.ds <- DS.prior(rat, max.m = 6, rat.start)
+rat.ds <- DS.prior(rat, max.m = 6, rat.start, family = "Binomial")
 
 ## ---- fig.height = 5.5, fig.width = 5.5, fig.align = 'center'------------
 plot(rat.ds, plot.type = "Ufunc")
@@ -15,7 +15,7 @@ plot(rat.ds, plot.type = "Ufunc")
 rat.ds
 
 ## ----fig.height = 5.5, fig.width = 5.5,fig.align = 'center'--------------
-plot(rat.ds, plot.type = "DSg")
+plot(rat.ds, plot.type = "DSg", main = "DS vs g: Rat")
 
 ## ---- warning = FALSE----------------------------------------------------
 rat.macro.md <- DS.macro.inf(rat.ds, num.modes = 2 , iters = 25, method = "mode") 
@@ -25,12 +25,66 @@ rat.macro.md
 
 ## ---- fig.height = 5.5, fig.width = 5.5,fig.align = 'center'-------------
 
-plot(rat.macro.md)
+plot(rat.macro.md, main = "MacroInference: Rat")
 
 ## ---- fig.align = 'center'-----------------------------------------------
-rat.y71.micro <- DS.micro.inf(rat.ds, y.i = 4, n.i = 14)
+rat.y71.micro <- DS.micro.inf(rat.ds, y.0 = 4, n.0 = 14)
 rat.y71.micro
 
 ## ----fig.height = 5.5, fig.width = 5.5,fig.align = 'center'--------------
-plot(rat.y71.micro)
+plot(rat.y71.micro, main = "Rat (4,14)")
+
+## ------------------------------------------------------------------------
+data(arsenic)
+arsn.start <- gMLE.nn(arsenic$y, arsenic$se, method = "DL")$estimate
+
+## ------------------------------------------------------------------------
+arsn.ds <- DS.prior(arsenic, max.m = 8, arsn.start, family = "Normal")
+
+## ---- fig.height = 5.5, fig.width = 5.5, fig.align = 'center'------------
+plot(arsn.ds, plot.type = "Ufunc")
+
+## ------------------------------------------------------------------------
+arsn.ds
+
+## ----fig.height = 5.5, fig.width = 5.5,fig.align = 'center'--------------
+plot(arsn.ds, plot.type = "DSg", main = "DS vs g: Arsenic")
+
+## ---- warning = FALSE----------------------------------------------------
+arsn.macro <- DS.macro.inf(arsn.ds, num.modes = 2, iters = 25, method = "mode")
+
+## ------------------------------------------------------------------------
+arsn.macro
+
+## ---- fig.height = 5.5, fig.width = 5.5,fig.align = 'center'-------------
+
+plot(arsn.macro, main = "MacroInference: Arsenic Data")
+
+## ------------------------------------------------------------------------
+data(ChildIll)
+child.start <- gMLE.pg(ChildIll)
+
+## ------------------------------------------------------------------------
+child.ds <- DS.prior(ChildIll, max.m = 8, child.start, family = "Poisson")
+
+## ---- fig.height = 5.5, fig.width = 5.5, fig.align = 'center'------------
+plot(child.ds, plot.type = "Ufunc")
+
+## ------------------------------------------------------------------------
+child.ds
+
+## ----fig.height = 5.5, fig.width = 5.5,fig.align = 'center'--------------
+plot(child.ds, plot.type = "DSg", main = "DS vs. g: Child Illness Data")
+
+## ------------------------------------------------------------------------
+child.micro.1 <- DS.micro.inf(child.ds, y.0 = 1)
+child.micro.3 <- DS.micro.inf(child.ds, y.0 = 3)
+child.micro.5 <- DS.micro.inf(child.ds, y.0 = 5)
+child.micro.10 <- DS.micro.inf(child.ds, y.0 = 10)
+
+## ---- fig.height = 3.25, fig.width = 3.25, fig.show = 'hold'-------------
+plot(child.micro.1, xlim = c(0,10), main = "y = 1")
+plot(child.micro.3, xlim = c(0,10), main = "y = 3")
+plot(child.micro.5, xlim = c(0,10), main = "y = 5")
+plot(child.micro.10, xlim = c(0,20), main = "y = 10")
 

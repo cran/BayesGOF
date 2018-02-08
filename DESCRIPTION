@@ -1,16 +1,16 @@
 Package: BayesGOF
 Type: Package
 Title: Bayesian Modeling via Goodness of Fit
-Version: 1.4
-Date: 2018-01-02
+Version: 2.1
+Date: 2018-02-08
 Author: Subhadeep Mukhopadhyay, Douglas Fletcher
 Maintainer: Doug Fletcher <tug25070@temple.edu>
-Description: Non-parametric method for learning prior distribution starting with parametric (subjective) prior.  It performs four interconnected tasks: (i) characterizes the uncertainty of the elicited prior; (ii) exploratory diagnostic for checking prior-data conflict; (iii) computes the final statistical prior density estimate; and (iv) performs macro- and micro-inference. Primary reference is Mukhopadhyay, S. and Fletcher, D. (2017, Technical Report). 
+Description: A Bayesian data modeling scheme that performs four interconnected tasks: (i) characterizes the uncertainty of the elicited parametric prior; (ii) provides exploratory diagnostic for checking prior-data conflict; (iii) computes the final statistical prior density estimate; and (iv) executes macro- and micro-inference. Primary reference is Mukhopadhyay, S. and Fletcher, D. (2018, Technical Report, <arXiv:1802.00474>). 
 Depends: orthopolynom, VGAM
 Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
 License: GPL-2
 NeedsCompilation: no
-Packaged: 2018-01-03 14:43:19 UTC; Doug
+Packaged: 2018-02-08 16:34:52 UTC; Doug
 Repository: CRAN
-Date/Publication: 2018-01-05 19:00:44 UTC
+Date/Publication: 2018-02-08 17:23:47 UTC

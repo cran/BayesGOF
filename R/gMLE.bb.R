@@ -1,4 +1,4 @@
-BetaBinoMLE <-
+gMLE.bb <-
 function (success, trials, start = NULL, optim.method = "default", 
                         lower = 0, upper = Inf) {
   #################################################################################

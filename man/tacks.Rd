@@ -17,7 +17,5 @@ An experiment that requires a common thumbtack to be "flipped" \eqn{n=9} times. 
 \source{
 Beckett, L. and Diaconis, P. (1994), "Spectral analysis for discrete longitudinal data," Advances in Mathematics, 103, 107-128.
 }
-\references{
-Liu, J.S. (1996), "Nonparameteric hierarchical Bayes via sequential imputations," The Annals of Statistics, 911-930.
-}
+
 \keyword{datasets}

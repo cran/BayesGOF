@@ -1,10 +1,10 @@
-rDS <-
+rDS.pgu <-
 function(k, g.par, LP.par){
 # Generates k samples from DS(G,m) model
 # INPUTS
 #  k				number of desired samples
 #  g.par			vector consisting of parameters 
-#					for g: c(alpha, beta)
+#					for g: c(alpha, scale = beta)
 #  LP.par			vector of LP coefficients: c(c_1,..,c_m)
 # OUTPUTS
 #  x.samp			length k vector of samples 
@@ -18,8 +18,8 @@ function(k, g.par, LP.par){
 		d.u <- 1 + LP.basis.beta(unit.vec, c(1,1), m)%*%LP.par 
 		d.max <- max(d.u)
 		while(DG.val < DU.val){
-			y <- rbeta(1, g.par[1], g.par[2]) 
-			Leg.G <- LP.basis.beta(y, g.par, m)
+			y <- rgamma(1, g.par[1], scale = g.par[2]) 
+			Leg.G <- LP.basis.gamma(y, g.par, m)
 			DG.val <- 1 + Leg.G%*%LP.par 
 			DU.val <- runif(1) * d.max 
 			}

@@ -1,14 +1,15 @@
-\name{BetaBinoMLE}
-\alias{BetaBinoMLE}
+\name{gMLE.bb}
+\alias{gMLE.bb}
 \alias{mom.est}
 
 \title{ Beta-Binomial Parameter Estimation }
 \description{
-A function that uses maximum likelihood to determine the parametric parameters for \eqn{g(\theta; \alpha, \beta)}.  
+A function that uses maximum likelihood to determine the parametric parameters for \eqn{g \sim}Beta\eqn{(\alpha,\beta)}.  
 }
 \usage{
-BetaBinoMLE(success, trials, start = NULL, optim.method = "default", 
-lower = 0, upper = Inf)
+gMLE.bb(success, trials, start = NULL, optim.method = "default", 
+        lower = 0, upper = Inf)
+		
 mom.est(success,trials)
 }
 
@@ -46,10 +47,10 @@ Also available is \code{mom.est}, which returns method of moments estimates for 
 \examples{
 data(rat)
 ### MLE estimate of alpha and beta
-rat.mle <- BetaBinoMLE(rat$y, rat$N)$estimate
+rat.mle <- gMLE.bb(rat$y, rat$N)$estimate
 rat.mle
 ### MoM estimate of alpha and beta
-rat.mom <- BetaBinoMLE(rat$y, rat$N)$initial
+rat.mom <- gMLE.bb(rat$y, rat$N)$initial
 rat.mom
 rat.mom.2 <- mom.est(rat$y, rat$N)
 rat.mom.2}
