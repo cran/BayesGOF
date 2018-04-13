@@ -13,6 +13,10 @@ function(DS.GF.obj, num.modes =1 , iters = 500,
 #  prior.fit		dataframe of prior information for plotting
 #  boot.modes/means	bootstrap mode or mean for simulation
 	#require(bbmle)
+	#LP.type = match.arg(DS.GF.obj$LP.type)
+	lambda.i <- function(s.i, tau.2){s.i^2/(s.i^2+tau.2)}
+	switch(DS.GF.obj$LP.type,
+		"L2" = {
 	method = match.arg(method)
 	switch(method,
 		"mode" = {
@@ -30,7 +34,8 @@ function(DS.GF.obj, num.modes =1 , iters = 500,
 			while(len.mode != num.modes){
 				par.g <- c(NA,NA)
 				while(!is.finite(par.g[1])==TRUE | !is.finite(par.g[2])==TRUE){
-					samps <- rDS.nnu(k = dim(DS.GF.obj$obs.data)[1], DS.GF.obj$g.par, DS.GF.obj$LP.par)  #Correct SD: sqrt()
+					samps <- DS.sampler(k = dim(DS.GF.obj$obs.data)[1], g.par = DS.GF.obj$g.par, 
+										   LP.par = DS.GF.obj$LP.par, con.prior = "Normal", LP.type = DS.GF.obj$LP.type)  #Correct SD: sqrt()
 					y.new<-NULL
 					for(j in 1:dim(DS.GF.obj$obs.data)[1]){
 						y.new[j] <- rnorm(1, samps[j], sd = DS.GF.obj$obs.data$se[j])
@@ -57,11 +62,20 @@ function(DS.GF.obj, num.modes =1 , iters = 500,
 		},
 		"mean" = {
 			out <- list()
+			if(sum(DS.GF.obj$LP.par^2) == 0){
+				m.new = 0
+				out$model.mean <- DS.GF.obj$g.par[1]
+				} else {
+				m.new = length(DS.GF.obj$LP.par)
+				out$model.mean <- sintegral(DS.GF.obj$prior.fit$theta.vals,
+							  DS.GF.obj$prior.fit$theta.vals*DS.GF.obj$prior.fit$ds.prior)$int
+				}
 			par.mean.vec <- NULL
 			for(i in 1:iters){
 				par.g <- c(NA,NA)
 				while(!is.finite(par.g[1])==TRUE | !is.finite(par.g[2])==TRUE){
-					samps <- rDS.nnu(k = dim(DS.GF.obj$obs.data)[1], DS.GF.obj$g.par, DS.GF.obj$LP.par)  
+					samps <- DS.sampler(k = dim(DS.GF.obj$obs.data)[1], g.par = DS.GF.obj$g.par, 
+										   LP.par = DS.GF.obj$LP.par, con.prior = "Normal", LP.type = DS.GF.obj$LP.type)  
 					y.new<-NULL
 					for(j in 1:dim(DS.GF.obj$obs.data)[1]){
 						y.new[j] <- rnorm(1, samps[j], DS.GF.obj$obs.data$se[j])
@@ -69,9 +83,16 @@ function(DS.GF.obj, num.modes =1 , iters = 500,
 					new.df<- data.frame(y = y.new, se = DS.GF.obj$obs.data$se)
 					par.g <- gMLE.nn(new.df$y, new.df$se, fixed = FALSE, method = "DL")$estimate
 					}				
-				par.mean.vec[i] <- par.g[1]
+				new.LPc <- DS.prior.nnu(new.df, max.m = m.new, 
+							    start.par = par.g)
+				if(sum(new.LPc$LP.par^2) == 0){
+					par.mean.vec[i] <- par.g[1]
+					} else {
+					par.mean.vec[i] <- sintegral(new.LPc$prior.fit$theta.vals,
+							  new.LPc$prior.fit$theta.vals*new.LPc$prior.fit$ds.prior)$int
+					}
 				}
-			out$model.mean <- DS.GF.obj$g.par[1]
+			
 			out$boot.mean <- par.mean.vec
 			out$mean.sd <- sd(par.mean.vec)
 			out$prior.fit <- DS.GF.obj$prior.fit
@@ -79,4 +100,105 @@ function(DS.GF.obj, num.modes =1 , iters = 500,
 			return(out)
 		}	
 		)
+	},
+	"MaxEnt" = {
+	method = match.arg(method)
+	switch(method,
+		"mode" = {
+			out <- list()				 
+			modes.mat <- matrix(0, nrow = iters, ncol = num.modes)
+			if(sum(DS.GF.obj$LP.par[-1]^2) == 0){
+				m.new = 0
+				out$model.modes <- Local.Mode(DS.GF.obj$prior.fit$theta.vals, DS.GF.obj$prior.fit$parm.prior)
+				} else {
+				m.new = length(DS.GF.obj$LP.par[-1])
+				out$model.modes <- Local.Mode(DS.GF.obj$prior.fit$theta.vals, DS.GF.obj$prior.fit$ds.prior)
+				}
+			for(i in 1:iters){
+			len.mode = num.modes+1
+			while(len.mode != num.modes){
+			L2.norm.thres <- 1.1*sqrt(sum((DS.GF.obj$LP.max.smt[1:DS.GF.obj$m.val]^2)))
+			L2.norm <- L2.norm.thres + 1
+			while(L2.norm > L2.norm.thres){
+				par.g <- c(NA,NA)
+				while(!is.finite(par.g[1])==TRUE | !is.finite(par.g[2])==TRUE){
+					samps <- DS.sampler(k = dim(DS.GF.obj$obs.data)[1], g.par = DS.GF.obj$g.par, 
+										   LP.par = DS.GF.obj$LP.par, con.prior = "Normal", LP.type = DS.GF.obj$LP.type)  #Correct SD: sqrt()
+					y.new<-NULL
+					for(j in 1:dim(DS.GF.obj$obs.data)[1]){
+						y.new[j] <- rnorm(1, samps[j], sd = DS.GF.obj$obs.data$se[j])
+						}
+					new.df<- data.frame(y = y.new, se = DS.GF.obj$obs.data$se)
+					par.g <- gMLE.nn(new.df$y, new.df$se, fixed = FALSE, method = "DL")$estimate
+					}			
+				new.LPc <- DS.prior.nnu(new.df, max.m = m.new, 
+							    start.par = par.g)
+				L2.norm <- sqrt(sum((new.LPc$LP.par)^2))
+				}
+			if(sum(new.LPc$LP.par^2) == 0){ 
+				  #new.LPc <- new.LPc
+				   modes.new <- new.LPc$prior.fit$theta.vals[which.max(new.LPc$prior.fit$parm.prior)]
+				   #L2.norm <- 0	
+				} else {
+				   new.LP.ME <- maxent.obj.convert(new.LPc)
+				   modes.new <- Local.Mode(new.LP.ME$prior.fit$theta.vals, new.LP.ME$prior.fit$ds.prior)
+				}
+			len.mode <- length(modes.new)
+				}
+		modes.mat[i,] <- modes.new
+		}
+		out$boot.modes <- modes.mat
+		out$mode.sd <- apply(modes.mat,2,sd)
+		out$prior.fit <- DS.GF.obj$prior.fit
+		class(out) <- "DS_GF_macro_mode"
+		return(out)	
+		},
+		"mean" = {
+			out <- list()
+			if(sum(DS.GF.obj$LP.par^2) == 0){
+				out$model.mean <- DS.GF.obj$g.par[1]
+				m.new = 0
+				} else {
+				out$model.mean <- sintegral(DS.GF.obj$prior.fit$theta.vals,
+							  DS.GF.obj$prior.fit$theta.vals*DS.GF.obj$prior.fit$ds.prior)$int
+				m.new = length(DS.GF.obj$LP.par)
+				}
+			par.mean.vec <- NULL
+			for(i in 1:iters){
+				L2.norm.thres <- 1.1*sqrt(sum((DS.GF.obj$LP.max.smt[1:DS.GF.obj$m.val]^2)))
+				L2.norm <- L2.norm.thres + 1
+				while(L2.norm > L2.norm.thres){
+					par.g <- c(NA,NA)
+					while(!is.finite(par.g[1])==TRUE | !is.finite(par.g[2])==TRUE){
+						samps <- DS.sampler(k = dim(DS.GF.obj$obs.data)[1], g.par = DS.GF.obj$g.par, 
+										   LP.par = DS.GF.obj$LP.par, con.prior = "Normal", LP.type = DS.GF.obj$LP.type)
+						y.new<-NULL
+						for(j in 1:dim(DS.GF.obj$obs.data)[1]){
+							y.new[j] <- rnorm(1, samps[j], DS.GF.obj$obs.data$se[j])
+							}
+						new.df<- data.frame(y = y.new, se = DS.GF.obj$obs.data$se)
+						par.g <- gMLE.nn(new.df$y, new.df$se, fixed = FALSE, method = "DL")$estimate
+						}
+				new.LPc <- DS.prior.nnu(new.df, max.m = m.new, 
+							    start.par = par.g)
+				L2.norm <- sqrt(sum((new.LPc$LP.par)^2))
+				}
+			if(sum(new.LPc$LP.par^2) == 0){ 
+				  par.mean.vec[i] <- par.g[1]	
+				} else {
+				   new.LP.ME <- maxent.obj.convert(new.LPc)
+				   par.mean.vec[i] <- sintegral(new.LP.ME$prior.fit$theta.vals,
+							  new.LP.ME$prior.fit$theta.vals*new.LP.ME$prior.fit$ds.prior)$int
+				}		
+			}		
+
+			out$boot.mean <- par.mean.vec
+			out$mean.sd <- sd(par.mean.vec)
+			out$prior.fit <- DS.GF.obj$prior.fit
+			class(out) <- "DS_GF_macro_mean"
+			return(out)
+		}	
+		)
+	}
+	)
 }

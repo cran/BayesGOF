@@ -9,15 +9,12 @@
 \format{
   A data frame of \eqn{(y_i, se_i)} for \eqn{i = 1,...,28}.
   \describe{
-    \item{\code{y}}{mean level of arsenic in the tissue measured by a single lab }
-    \item{\code{se}}{the standard error of the measurement by a single lab}
+    \item{\code{y}}{mean level of arsenic in the tissue measured by the \eqn{i^{th}} lab}
+    \item{\code{se}}{the standard error of the measurement by \eqn{i^{th}} lab}
   }
 }
 
 \source{ 
-Wille, S. and Berman, S. (1995), "Ninth round intercomparison for trace metals in marine sediments and biological tissues," NRC/NOAA.
-}
-\references{
-Possolo, A. (2013), "Five examples of assessment and expression of measurement uncertainty," Applied Stochastic Models in Business and Industry, 29, 1-18.
+Wille, S. and Berman, S., 1995. "Ninth round intercomparison for trace metals in marine sediments and biological tissues," \emph{NRC/NOAA}.
 }
 \keyword{datasets}

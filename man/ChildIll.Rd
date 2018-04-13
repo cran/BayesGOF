@@ -1,19 +1,18 @@
 \name{ChildIll}
 \alias{ChildIll}
 \docType{data}
-\title{ Child illness data
-}
-\description{ Results of a study where researchers followed \eqn{k = 602} pre-school children in north-east Thailand from June 1982 through September 1985.  Researchers recorded the number of times a child became ill during every 2-week period.
+\title{Frequency of child illness}
+\description{ Results of a study that followed \eqn{k = 602} pre-school children in north-east Thailand from June 1982 through September 1985.  Researchers recorded the number of times a child became ill during every 2-week period.
 }
 \usage{data("ChildIll")}
 \format{
  A vector of length \eqn{k=602}.
   \describe{
-    \item{\code{value}}{number of times child \eqn{i} became ill during the study.}
+    \item{\code{value}}{number of times the \eqn{i^{th}} child became ill during the study}
 
   }
 }
 
-\source{Bohning, D. (2000), "Computer-assisted Analysis of Mixtures and Applications: Meta-analysis, Disease Mapping, and Others," Boca Raton: Chapman and Hall-CRC.
+\source{Bohning, D., 2000. \emph{Computer-assisted Analysis of Mixtures and Applications: Meta-analysis, Disease Mapping, and Others} (Vol. 81). CRC press.
 }
 \keyword{datasets}

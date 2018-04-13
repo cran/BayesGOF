@@ -1,6 +1,6 @@
 DS.prior <-
-function(input, max.m = 8, g.par, iters = 200, family = c("Normal","Binomial", "Poisson"),
-						B = 1000, smooth.crit = "BIC"){
+function(input, max.m = 8, g.par,  family = c("Normal","Binomial", "Poisson"),
+			LP.type = c("L2","MaxEnt"), smooth.crit = "BIC", iters = 200, B = 1000){
 ####iterates through given conditions to find c-vector
 #### INPUTS		
 #### yn.df 			dataframe with 1st column as predictions for X from each of k servers
@@ -21,18 +21,22 @@ function(input, max.m = 8, g.par, iters = 200, family = c("Normal","Binomial", "
 #### $obs.data		Original observed data
 #### $cutoff		norm distance between old c.vec and new c.vec;
 	fam = match.arg(family)
+	meth = match.arg(LP.type)
 	switch(fam,
 		"Normal" = {
 			DS.prior.nnu(yn.df = input, max.m = max.m , start.par = g.par, 
-						 iter.c = iters, B = B, smooth.crit = smooth.crit)
+						 iter.c = iters, B = B, smooth.crit = smooth.crit,
+						 LP.type = meth)
 		 },
 		 "Binomial" = {
 			DS.prior.bbu(yn.df = input, max.m = max.m , start.par= g.par, 
-						  iter.c = iters, B = B, smooth.crit = smooth.crit)
+						  iter.c = iters, B = B, smooth.crit = smooth.crit,
+						  LP.type = meth)
 		 },
 		 "Poisson" = {
 			DS.prior.pgu(vec.counts = input, max.m = max.m , start.par= g.par, 
-						 iter.c = iters, B = B, smooth.crit = smooth.crit)
+						 iter.c = iters, B = B, smooth.crit = smooth.crit,
+						 LP.type = meth)
 				}
 			 
 		)

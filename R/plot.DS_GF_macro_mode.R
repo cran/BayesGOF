@@ -10,7 +10,7 @@ function(x, ...){
 		plot(x$prior.fit$theta.vals, x$prior.fit$ds.prior, 
 			type = "l", yaxs = "i", lwd = 2, col = "red3",
 			xlab = expression(theta), ylab = "", font.main = 1,
-			cex.lab=1.45, cex.axis=1.5, cex.main=2, cex.sub=1.5, ...)
+			cex.lab=1.45, cex.axis=1.5, cex.main= 1.75, cex.sub=1.5, ...)
 		title(ylab = expression(paste(hat(pi)(theta))), line = 2.3, cex.lab=1.45)
 		points(x$model.modes, rep(0, length(x$model.modes)), col = "green", pch = 17, cex = 1.5)
 		for(i in 1:length(x$model.modes)){
@@ -22,7 +22,7 @@ function(x, ...){
 		plot(x$prior.fit$theta.vals, x$prior.fit$parm.prior, 
 			type = "l", yaxs = "i", lwd = 2, col = "red3",
 			xlab = expression(theta), ylab = "", font.main = 1,
-			cex.lab=1.45, cex.axis=1.5, cex.main=2, cex.sub=1.5, ...)
+			cex.lab=1.45, cex.axis=1.5, cex.main= 1.75, cex.sub=1.5, ...)
 		title(ylab = expression(paste(hat(pi)(theta))), line = 2.3, cex.lab=1.45)
 		points(x$model.modes, rep(0, length(x$model.modes)), col = "green", pch = 17, cex = 1.5)
 		for(i in 1:length(x$model.modes)){

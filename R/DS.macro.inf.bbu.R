@@ -12,13 +12,24 @@ function(DS.GF.obj, num.modes =1 , iters = 500,
 #  mode.sd			standard deviation of modes (generated through simulation)
 #  prior.fit		dataframe of prior information for plotting
 #  boot.modes/means	bootstrap mode or mean for simulation
-	#require(bbmle)
-	method = match.arg(method)
+#### Declare Functions used in Macro
 	test.distname <- "betabinom.ab"
-			test.ddistname <- paste("d", test.distname, sep = "")
-			fnobj.test <- function(par, x, n, test.ddistnam) {
-									-sum(do.call(test.ddistnam, c(list(x), list(n), par, log = TRUE)))
+	test.ddistname <- paste("d", test.distname, sep = "")
+	fnobj.test <- function(par, x, n, test.ddistnam) {
+		-sum(do.call(test.ddistnam, c(list(x), list(n), par, log = TRUE)))
 				}
+	mom.est <- function(success, trials){
+						start.mu <- mean(success/trials)
+						start.var <- var(success/trials)
+						start.a <- ((1 - start.mu) / start.var - 1 / start.mu) * start.mu ^ 2
+						start.b <- start.a * (1 / start.mu - 1)
+						start.vals <- c(start.a, start.b)
+					return(start.vals)
+				}
+###########
+	switch(DS.GF.obj$LP.type,
+		"L2" = {
+	method = match.arg(method)
 	switch(method,
 		"mode" = {
 			out <- list()				 
@@ -37,7 +48,8 @@ function(DS.GF.obj, num.modes =1 , iters = 500,
 				while(!is.finite(par.g[1])==TRUE | !is.finite(par.g[2])==TRUE){
 					log.lik.test <- NA
 					while(!is.finite(log.lik.test)==TRUE){
-						samps <- rDS.bbu(k = dim(DS.GF.obj$obs.data)[1], DS.GF.obj$g.par, DS.GF.obj$LP.par)  
+						samps <- DS.sampler(k = dim(DS.GF.obj$obs.data)[1], g.par = DS.GF.obj$g.par, 
+										   LP.par = DS.GF.obj$LP.par, con.prior = "Beta", LP.type = DS.GF.obj$LP.type)  
 						y.new<-NULL
 						for(j in 1:dim(DS.GF.obj$obs.data)[1]){
 							y.new[j] <- rbinom(1, DS.GF.obj$obs.data$n[j], samps[j])
@@ -67,13 +79,22 @@ function(DS.GF.obj, num.modes =1 , iters = 500,
 		},
 		"mean" = {
 			out <- list()
+			if(sum(DS.GF.obj$LP.par^2) == 0){
+				m.new = 0
+				out$model.mean <- DS.GF.obj$g.par[1]/(DS.GF.obj$g.par[1]+DS.GF.obj$g.par[2])
+				} else {
+				m.new = length(DS.GF.obj$LP.par)
+				out$model.mean <- sintegral(DS.GF.obj$prior.fit$theta.vals,
+							  DS.GF.obj$prior.fit$theta.vals*DS.GF.obj$prior.fit$ds.prior)$int
+				}
 			par.mean.vec <- NULL
 			for(i in 1:iters){
 				par.g <- c(NA,NA)
 				while(!is.finite(par.g[1])==TRUE | !is.finite(par.g[2])==TRUE){
 					log.lik.test <- NA
 					while(!is.finite(log.lik.test)==TRUE){
-						samps <- rDS.bbu(k = dim(DS.GF.obj$obs.data)[1], DS.GF.obj$g.par, DS.GF.obj$LP.par)  
+						samps <- DS.sampler(k = dim(DS.GF.obj$obs.data)[1], g.par = DS.GF.obj$g.par, 
+										   LP.par = DS.GF.obj$LP.par, con.prior = "Beta", LP.type = DS.GF.obj$LP.type)  
 						y.new<-NULL
 						for(j in 1:dim(DS.GF.obj$obs.data)[1]){
 							y.new[j] <- rbinom(1, DS.GF.obj$obs.data$n[j], samps[j])
@@ -85,9 +106,15 @@ function(DS.GF.obj, num.modes =1 , iters = 500,
 						}
 					par.g <- gMLE.bb(new.df$y, new.df$n)$estimate
 					}				
-				par.mean.vec[i] <- par.g[1]/(par.g[1]+par.g[2])
+				new.LPc <- DS.prior.bbu(new.df, max.m = m.new, 
+							    start.par = par.g)
+				if(sum(new.LPc$LP.par^2) == 0){
+					par.mean.vec[i] <- par.g[1]/(par.g[1]+par.g[2])
+					} else {
+					par.mean.vec[i] <- sintegral(new.LPc$prior.fit$theta.vals,
+							  new.LPc$prior.fit$theta.vals*new.LPc$prior.fit$ds.prior)$int
+					}
 				}
-			out$model.mean <- DS.GF.obj$g.par[1]/(DS.GF.obj$g.par[1]+DS.GF.obj$g.par[2])
 			out$boot.mean <- par.mean.vec
 			out$mean.sd <- sd(par.mean.vec)
 			out$prior.fit <- DS.GF.obj$prior.fit
@@ -95,4 +122,115 @@ function(DS.GF.obj, num.modes =1 , iters = 500,
 			return(out)
 		}	
 		)
+	},
+	"MaxEnt" = {
+	method = match.arg(method)
+	switch(method,
+		"mode" = {
+			out <- list()				 
+			modes.mat <- matrix(0, nrow = iters, ncol = num.modes)
+			if(sum(DS.GF.obj$LP.par^2) == 0){
+				m.new = 0
+				out$model.modes <- Local.Mode(DS.GF.obj$prior.fit$theta.vals, DS.GF.obj$prior.fit$parm.prior)
+				} else {
+				m.new = length(DS.GF.obj$LP.par)
+				out$model.modes <- Local.Mode(DS.GF.obj$prior.fit$theta.vals, DS.GF.obj$prior.fit$ds.prior)
+				}
+			for(i in 1:iters){
+			len.mode = num.modes+1
+			while(len.mode != num.modes){
+			L2.norm.thres <- 1.1*sqrt(sum((DS.GF.obj$LP.max.smt[1:DS.GF.obj$m.val]^2)))
+			L2.norm <- L2.norm.thres + 1
+			while(L2.norm > L2.norm.thres){
+				par.g <- c(NA,NA)
+				while(!is.finite(par.g[1])==TRUE | !is.finite(par.g[2])==TRUE){
+					log.lik.test <- NA
+					while(!is.finite(log.lik.test)==TRUE){
+						samps <- DS.sampler(k = dim(DS.GF.obj$obs.data)[1], g.par = DS.GF.obj$g.par, 
+										   LP.par = DS.GF.obj$LP.par, con.prior = "Beta", LP.type = DS.GF.obj$LP.type)  
+						y.new<-NULL
+						for(j in 1:dim(DS.GF.obj$obs.data)[1]){
+							y.new[j] <- rbinom(1, DS.GF.obj$obs.data$n[j], samps[j])
+							}
+						new.df<- data.frame(y = y.new, n = DS.GF.obj$obs.data$n)
+						test.start <- mom.est(new.df$y, new.df$n)
+						log.lik.test <- fnobj.test(test.start, new.df$y, new.df$n, test.ddistname)
+						}
+					par.g <- gMLE.bb(new.df$y, new.df$n)$estimate
+					}			
+				new.LPc <- DS.prior.bbu(new.df, max.m = m.new, 
+							    start.par = par.g)
+				L2.norm <- sqrt(sum((new.LPc$LP.par)^2))
+				}
+				if(sum(new.LPc$LP.par^2) == 0){ 
+				  #new.LPc <- new.LPc
+				   modes.new <- new.LPc$prior.fit$theta.vals[which.max(new.LPc$prior.fit$parm.prior)]
+				   #L2.norm <- 0	
+				} else {
+				   new.LP.ME <- maxent.obj.convert(new.LPc)
+				   modes.new <- Local.Mode(new.LP.ME$prior.fit$theta.vals, new.LP.ME$prior.fit$ds.prior)
+				}
+				len.mode <- length(modes.new)
+				}
+		modes.mat[i,] <- modes.new
+		}
+		out$boot.modes <- modes.mat
+		out$mode.sd <- apply(modes.mat,2,sd)
+		out$prior.fit <- DS.GF.obj$prior.fit
+		class(out) <- "DS_GF_macro_mode"
+		return(out)	
+		},
+		"mean" = {
+			out <- list()
+			if(sum(DS.GF.obj$LP.par^2) == 0){
+				m.new = 0
+				out$model.mean <- DS.GF.obj$g.par[1]/(DS.GF.obj$g.par[1]+DS.GF.obj$g.par[2])
+				} else {
+				m.new = length(DS.GF.obj$LP.par)
+				out$model.mean <- sintegral(DS.GF.obj$prior.fit$theta.vals,
+							  DS.GF.obj$prior.fit$theta.vals*DS.GF.obj$prior.fit$ds.prior)$int
+				}
+			par.mean.vec <- NULL
+			for(i in 1:iters){
+				L2.norm.thres <- 1.1*sqrt(sum((DS.GF.obj$LP.max.smt[1:DS.GF.obj$m.val]^2)))
+				L2.norm <- L2.norm.thres + 1
+				while(L2.norm > L2.norm.thres){
+					par.g <- c(NA,NA)
+					while(!is.finite(par.g[1])==TRUE | !is.finite(par.g[2])==TRUE){
+						log.lik.test <- NA
+						while(!is.finite(log.lik.test)==TRUE){
+							samps <- DS.sampler(k = dim(DS.GF.obj$obs.data)[1], g.par = DS.GF.obj$g.par, 
+										   LP.par = DS.GF.obj$LP.par, con.prior = "Beta", LP.type = DS.GF.obj$LP.type)  
+							y.new<-NULL
+							for(j in 1:dim(DS.GF.obj$obs.data)[1]){
+								y.new[j] <- rbinom(1, DS.GF.obj$obs.data$n[j], samps[j])
+								}
+							new.df<- data.frame(y = y.new, n = DS.GF.obj$obs.data$n)
+							test.start <- mom.est(new.df$y, new.df$n)
+							log.lik.test <- fnobj.test(test.start, new.df$y, new.df$n, test.ddistname)
+							log.lik.test
+							}
+						par.g <- gMLE.bb(new.df$y, new.df$n)$estimate
+						}				
+				new.LPc <- DS.prior.bbu(new.df, max.m = m.new, 
+							    start.par = par.g)
+				L2.norm <- sqrt(sum((new.LPc$LP.par)^2))
+				}
+			if(sum(new.LPc$LP.par^2) == 0){ 
+				  par.mean.vec[i] <- par.g[1]/(par.g[1]+par.g[2])	
+				} else {
+				   new.LP.ME <- maxent.obj.convert(new.LPc)
+				   par.mean.vec[i] <- sintegral(new.LP.ME$prior.fit$theta.vals,
+							  new.LP.ME$prior.fit$theta.vals*new.LP.ME$prior.fit$ds.prior)$int
+				}		
+				}
+			out$boot.mean <- par.mean.vec
+			out$mean.sd <- sd(par.mean.vec)
+			out$prior.fit <- DS.GF.obj$prior.fit
+			class(out) <- "DS_GF_macro_mean"
+			return(out)
+		}	
+		)
+	}
+	)
 }

@@ -1,6 +1,6 @@
 DS.macro.inf <-
-function(DS.GF.obj, num.modes =1 , iters = 25, e.vec = NULL,
-						 method = c("mean","mode")){
+function(DS.GF.obj, num.modes =1, method = c("mean","mode"),
+						iters = 25, e.vec = NULL){
 	fam = DS.GF.obj$fam
 	switch(fam,
 		"Normal" = {

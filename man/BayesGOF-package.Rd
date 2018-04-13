@@ -10,7 +10,7 @@ A Bayesian data modeling scheme that performs four interconnected tasks: (i) cha
 }
 
 \references{
-Mukhopadhyay, S. and Fletcher, D. (2018), "Bayesian Modeling via Goodness of Fit," Technical report, \url{https://arxiv.org/abs/1802.00474 }.
+Mukhopadhyay, S. and Fletcher, D., 2018. "Bayesian Modeling via Goodness-of-Fit," Technical report, \url{https://arxiv.org/abs/1802.00474 }.
 }
 \keyword{ package }
 

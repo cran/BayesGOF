@@ -1,7 +1,7 @@
 Reduce.LP.coef.univ <-
-function(wght.mat, LP.par, u, leg.mat, freq.vec = NULL, k.tot = NULL){
+function(wght.mat, LP.par, leg.mat, freq.vec = NULL, k.tot = NULL){
 	L.mat <- matrix(0, nrow = length(LP.par), ncol = dim(wght.mat)[2])
-	L.mat <- apply(wght.mat, 2, function(x) EXP.score(u, LP.par, x, leg.mat))
+	L.mat <- apply(wght.mat, 2, function(x) EXP.score(LP.par, x, leg.mat))
 	if(!is.null(freq.vec) && !is.null(k.tot)){
 		new.c.vec <- as.vector( (L.mat %*% as.vector(freq.vec) ) )/k.tot
 		}else{

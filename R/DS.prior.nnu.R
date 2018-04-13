@@ -1,26 +1,31 @@
 DS.prior.nnu <-
 function(yn.df, max.m = 8, start.par, iter.c = 200, 
-						B = 1000, smooth.crit = "BIC"){
+						B = 1000, smooth.crit = "BIC", LP.type = c("L2","MaxEnt")){
+			LP.type <- match.arg(LP.type)
 			fam <- "Normal"
-			#yn.df <- input
 			out <- list()
+			lambda.i <- function(s.i, tau.2){s.i^2/(s.i^2+tau.2)}
+			#PEB g
 			theta.vals <- seq(start.par[1] - 3*sqrt(start.par[2]),
 						start.par[1] + 3*sqrt(start.par[2]), length.out = 1000)
-			d.x <- dnorm(theta.vals, start.par[1], sqrt(start.par[2]))
-			u.grid <- seq(0,1, length.out = B)
+			PEB.g <- dnorm(theta.vals, start.par[1], sd = sqrt(start.par[2]))
+			u.grid <- pnorm(theta.vals, start.par[1], sd= sqrt(start.par[2])) #test
+			#u.grid <- seq(0,1, length.out = B)
 			#Check for m = 0
 			if(max.m == 0){
 				out$g.par <- start.par
 				out$LP.par <- 0
 				out$prior.fit <- data.frame(theta.vals = theta.vals,
-											 parm.prior = d.x)
+											 parm.prior = PEB.g)
 				out$UF.data <- data.frame(UF.x = u.grid, UF.y = rep(1,length(u.grid)))
 				out$obs.data <- data.frame(y = yn.df[,1], se = yn.df[,2])
 				out$dev.df <- data.frame(m = 0, dev = 0)
+				out$LP.type <- "L2"
 				out$fam <- fam
 				class(out) <- "DS_GF"
 				return(out)
 				}
+			#Initialize for LP means
 			c.vec <- NULL
 			dev.m <- NULL
 			B.loop <- 150
@@ -38,9 +43,9 @@ function(yn.df, max.m = 8, start.par, iter.c = 200,
 				for(j in 1:max.m){
 					c.vec[j]<-0 #Force jth entry to be zero
 					cutoff.c <- 0 ###uses cutoff in base file
-					leg.mat.j <- LP.basis.beta(u.loop, c(1,1), length(c.vec))
+					leg.mat.j <- gLP.basis(u.loop, c(1,1), length(c.vec), con.prior = "Beta")
 					for(i in 1:iter.c){ ##uses just iter in base file
-						c.L.new <- Reduce.LP.coef.univ(wght.mat=wght.loop, c.vec, u.loop, leg.mat.j, freq.vec = NULL, k.tot = NULL)
+						c.L.new <- Reduce.LP.coef.univ(wght.mat=wght.loop, c.vec, leg.mat.j, freq.vec = NULL, k.tot = NULL)
 						cutoff.c[i+1] <- sqrt(sum((c.L.new - c.vec)^2))
 						c.vec[j] <- c.L.new[j] #replaces old jth entry with new jth entry
 						if (cutoff.c[i+1] < 0.006 | abs(cutoff.c[i+1] - cutoff.c[(i)]) < 0.000006 ) {break}
@@ -52,9 +57,9 @@ function(yn.df, max.m = 8, start.par, iter.c = 200,
 				for(j in 1:max.m){
 					c.vec[j]<-0 #Force jth entry to be zero
 					cutoff.c <- 0 ###uses cutoff in base file
-					leg.mat.j <- LP.basis.beta(u.loop, c(1,1), length(c.vec))
+					leg.mat.j <- gLP.basis(u.loop, c(1,1), length(c.vec), con.prior = "Beta")
 					for(i in 1:iter.c){ ##uses just iter in base file
-						c.L.new <- Reduce.LP.coef.univ(wght.mat=wght.loop, c.vec, u.loop, leg.mat.j, freq.vec = NULL, k.tot = NULL)
+						c.L.new <- Reduce.LP.coef.univ(wght.mat=wght.loop, c.vec, leg.mat.j, freq.vec = NULL, k.tot = NULL)
 						cutoff.c[i+1] <- sqrt(sum((c.L.new - c.vec)^2))
 						c.vec[j] <- c.L.new[j] #replaces old jth entry with new jth entry
 						if (cutoff.c[i+1] < 0.006 | abs(cutoff.c[i+1] - cutoff.c[(i)]) < 0.000006 ) {break}
@@ -72,10 +77,11 @@ function(yn.df, max.m = 8, start.par, iter.c = 200,
 				out$LP.max.uns <- c.vec
 				out$LP.max.smt <- LP.smooth(c.vec, dim(yn.df)[1], method = smooth.crit)
 				out$prior.fit <- data.frame(theta.vals = theta.vals,
-									   parm.prior = d.x)
+									   parm.prior = PEB.g)
 				out$UF.data <- data.frame(UF.x = u.grid, UF.y = rep(1,length(u.grid)))
 				out$obs.data <- data.frame(y = yn.df[,1], se = yn.df[,2])
 				out$dev.df <- data.frame(  m = m.vec, dev = dev.m)
+				out$LP.type <- "L2"
 				out$fam <- fam
 				class(out) <- "DS_GF"
 				return(out)
@@ -88,19 +94,25 @@ function(yn.df, max.m = 8, start.par, iter.c = 200,
 				out$g.par <- c(start.par[1], start.par[2])
 				names(out$g.par) <- c("mu","tau^2")
 				names(out$LP.par) <- paste("LP",1:length(out$LP.par),sep = "")
-				##### Generate data frame of values to plot both DC and PAR priors, CD
-				CDen.u <- 1 + LP.basis.beta(u.grid,c(1,1),out$m.val)%*%out$LP.par
-				Leg.mat <- LP.basis.norm(theta.vals, start.par, out$m.val)
-				CDen <- 1+Leg.mat%*%out$LP.par
-				DS.sm <- d.x*CDen
-				DS.sm[DS.sm<0]<-0
-				CDen.u[CDen.u<0] <- 0
+				##### Generate data frame of values to plot both DS and PEB priors, Ufunction
+				d.u <- 1 + gLP.basis(u.grid,c(1,1),out$m.val, con.prior = "Beta")%*%out$LP.par
+				Leg.mat <- gLP.basis(theta.vals, start.par, out$m.val, con.prior = "Normal")
+				d.G <- 1+Leg.mat%*%out$LP.par
+				DS.sm <- PEB.g*d.G
+				DS.sm[DS.sm<0]<-0.0000000001
+				d.u[d.u<0] <- 0.0000000001
 				out$prior.fit <- data.frame(theta.vals = theta.vals,
-											 parm.prior = d.x,
+											 parm.prior = PEB.g,
 											 ds.prior = DS.sm)
-				out$UF.data <- data.frame(UF.x = u.grid, UF.y = CDen.u)
+				out$UF.data <- data.frame(UF.x = u.grid, UF.y = d.u)
 				out$obs.data <- data.frame(y = yn.df[,1], se = yn.df[,2])
 				out$fam <- fam
+				if(LP.type == "L2"){
+					out$LP.type <- "L2"
+					} else {
+					out <- maxent.obj.convert(out)
+					out$LP.type <- "MaxEnt"
+					}
 				class(out) <- "DS_GF"
 				return(out)
 				}

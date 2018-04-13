@@ -35,11 +35,29 @@ rat.y71.micro
 plot(rat.y71.micro, main = "Rat (4,14)")
 
 ## ------------------------------------------------------------------------
+data(galaxy)
+gal.start <- gMLE.nn(galaxy$y, galaxy$se, method = "DL")$estimate
+
+## ------------------------------------------------------------------------
+gal.ds.L2 <- DS.prior(galaxy[,c(1,2)], max.m = 6, g.par = gal.start, family = "Normal", LP.type = "L2")
+gal.ds.ME <- DS.prior(galaxy[, c(1,2)], max.m = 6, g.par = gal.start, family = "Normal", LP.type = "MaxEnt")
+
+## ---- fig.height = 3.25, fig.width = 3.25, fig.show = 'hold'-------------
+plot(gal.ds.L2, plot.type = "Ufunc", main = "L2 U-function")
+plot(gal.ds.L2, plot.type = "DSg", main = "L2 DS vs g")
+plot(gal.ds.ME, plot.type = "Ufunc", main = "MaxEnt U-function")
+plot(gal.ds.ME, plot.type = "DSg", main = "MaxEnt DS vs g")
+
+## ------------------------------------------------------------------------
+gal.ds.L2
+gal.ds.ME
+
+## ------------------------------------------------------------------------
 data(arsenic)
 arsn.start <- gMLE.nn(arsenic$y, arsenic$se, method = "DL")$estimate
 
 ## ------------------------------------------------------------------------
-arsn.ds <- DS.prior(arsenic, max.m = 8, arsn.start, family = "Normal")
+arsn.ds <- DS.prior(arsenic, max.m = 4, arsn.start, family = "Normal", LP.type = "MaxEnt")
 
 ## ---- fig.height = 5.5, fig.width = 5.5, fig.align = 'center'------------
 plot(arsn.ds, plot.type = "Ufunc")

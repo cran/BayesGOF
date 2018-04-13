@@ -1,33 +1,41 @@
 DS.micro.inf.pgu <- 
-function(DS.GF.obj, y.i){
-#####################################################
-# INPUTS
-#  y.i				number of expected count
-#  DS.GF.obj		AutoBayes-DataCorrect object
-# OUTPUTS
-		fam <- "Poisson"
-		out <- list()
-		post.alph.i <- y.i + DS.GF.obj$g.par[1]
-		post.beta.i <- DS.GF.obj$g.par[2]/(1+DS.GF.obj$g.par[2])
-		##calculate denominator/standardization constant
-		B=250
-		u.int <- seq(1/B, 1-(1/B), length.out = B)
-		theta.vals <- seq(0,max(DS.GF.obj$obs.data), length.out = B)
-		eb.pos.den <- dgamma(theta.vals, post.alph.i, scale = post.beta.i)
-		#determine LP density
-		leg.mat.den <- LP.basis.beta(u.int, c(1,1), length(DS.GF.obj$LP.par))
-		wght.den <- weight.fun.univ(u.int, DS.GF.obj$g.par[1], DS.GF.obj$g.par[2],
-					post.alph.i, post.beta.i, family = fam)
-		##Get non-standard LP adjusted density
-		Leg.G <- LP.basis.gamma(theta.vals, c(DS.GF.obj$g.par[1], DS.GF.obj$g.par[2]), length(DS.GF.obj$LP.par))
-		ds.pos <- eb.pos.den*(1+Leg.G%*%DS.GF.obj$LP.par) / EXP.denom(DS.GF.obj$LP.par, wght.den, leg.mat.den)
-		out$post.fit <- data.frame(theta.vals = theta.vals,
-									parm.pos = eb.pos.den,
-									ds.pos = ds.pos)				
-		out$post.fit[out$post.fit<0]<-0
-		out$post.mean <- DS.PostMean.pgu(y.i, DS.GF.obj$g.par, u.int, DS.GF.obj$LP.par)
-		out$post.mode <- theta.vals[which.max(ds.pos)]
-		out$cnt.val <- y.i
-		class(out) <- "DS_GF_micro"
-		return(out)
+function(DS.GF.obj, y.0){
+	fam <- "Poisson"
+	out <- list()
+	##### EB Posterior and Family Calculations
+	post.alph.i <- y.0 + DS.GF.obj$g.par[1]
+	post.beta.i <- DS.GF.obj$g.par[2]/(1+DS.GF.obj$g.par[2])
+	###Set up conversion based on d(u)
+	theta.conv <- qgamma(DS.GF.obj$UF.data$UF.x, DS.GF.obj$g.par[1], 
+						 scale = DS.GF.obj$g.par[2])
+	PEB.pos.den <- dgamma(theta.conv, post.alph.i, 
+						 scale = post.beta.i) #in terms of theta
+	out$PEB.mode <- theta.conv[which.max(PEB.pos.den)]
+	out$PEB.mean <- post.alph.i * post.beta.i
+	if(sum(DS.GF.obj$LP.par^2)==0){
+		out$DS.mean <- out$PEB.mean
+		out$DS.mode <- out$PEB.mode
+		out$post.vec <- c(out$PEB.mean, out$DS.mean, out$PEB.mode, out$DS.mode)
+		out$post.fit <- data.frame(theta.vals = theta.conv,
+						   parm.pos = PEB.pos.den)
+		out$study <- y.0
+		} else {
+		wght.den <- weight.fun.univ(DS.GF.obj$UF.data$UF.x, 
+					DS.GF.obj$g.par[1], DS.GF.obj$g.par[2],
+					post.alph.i, post.beta.i, family = fam) # in terms of u
+	##### LP posterior calculations
+		denom <- sintegral(DS.GF.obj$UF.data$UF.x,
+				DS.GF.obj$UF.data$UF.y*wght.den)$int # in terms of u
+		LP.pos.den <- PEB.pos.den * (DS.GF.obj$UF.data$UF.y/denom) #in terms of theta
+		out$post.fit <- data.frame(theta.vals = theta.conv,
+									parm.pos = PEB.pos.den,
+									ds.pos = LP.pos.den)
+		out$DS.mean <- sintegral(DS.GF.obj$UF.data$UF.x,
+				   theta.conv*DS.GF.obj$UF.data$UF.y*wght.den)$int / denom #in terms of u
+		out$DS.mode <- out$post.fit$theta.vals[which.max(out$post.fit$ds.pos)]
+		out$post.vec <- c(out$PEB.mean, out$DS.mean, out$PEB.mode, out$DS.mode)
+		out$study <- y.0
 		}
+	class(out) <- "DS_GF_micro"
+	return(out)
+}

@@ -9,17 +9,17 @@
 \format{
   A data frame of \eqn{(y_i, n_i)} for \eqn{i = 1,...,70}.
   \describe{
-    \item{\code{y}}{number of female rats in a study who developed polyps/tumors}
-    \item{\code{n}}{total number of rats in the particular study}
+    \item{\code{y}}{number of female rats in the \eqn{i^{th}} study who developed polyps/tumors}
+    \item{\code{n}}{total number of rats in the \eqn{i^{th}} study}
   }
 }
 
 \source{ 
-National Cancer Institute (1977), "Bioassay of phenformin for possible carcinogenicity," Technical Report No. 7.
+National Cancer Institute (1977), "Bioassay of phenformin for possible carcinogenicity," \emph{Technical Report No. 7}.
 }
 \references{
-Gelman, A., Carlin, J.B., Stern, H.S., Dunson, D.B., Vehtari, A., and Rubin, D.B. (2013), Baysian Data Analysis, Third Edition, Chapman & Hall/ CRC Texts in Statistical Science, Taylor & Francis.
+Gelman, A., Carlin, J.B., Stern, H.S., Dunson, D.B., Vehtari, A., and Rubin, D.B., 2014. \emph{Bayesian Data Analysis} (Vol. 3). Boca Raton, FL: CRC press.
 
-Tarone, R.E. (1982), "The use of historical control information in testing for a trend in proportions," Biometrics, 215-220.
+Tarone, R.E., 1982. "The use of historical control information in testing for a trend in proportions," \emph{Biometrics}, pp. 215-220.
 }
 \keyword{datasets}
