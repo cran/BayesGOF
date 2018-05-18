@@ -1,6 +1,6 @@
 DS.sampler.post <-
 function(k, g.par, LP.par, y.0, n.0 = NULL, con.prior = c("Normal", "Beta", "Gamma"), 
-			LP.type = c("L2","ME"), B = 250){
+			LP.type = c("L2","MaxEnt"), B = 250){
 	fam = match.arg(con.prior)
 	LPt = match.arg(LP.type)
 	switch(fam,
@@ -133,6 +133,7 @@ function(k, g.par, LP.par, y.0, n.0 = NULL, con.prior = c("Normal", "Beta", "Gam
 					}
 				return(x.samp)
 			} else {
+				x.i <- y.0
 				m <- length(LP.par)-1
 				post.alpha <- g.par[1] + x.i
 				post.beta <- g.par[2]/(1+g.par[2])

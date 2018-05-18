@@ -75,8 +75,19 @@ arsn.macro <- DS.macro.inf(arsn.ds, num.modes = 2, iters = 25, method = "mode")
 arsn.macro
 
 ## ---- fig.height = 5.5, fig.width = 5.5,fig.align = 'center'-------------
-
-plot(arsn.macro, main = "MacroInference: Arsenic Data")
+#plot(arsn.macro, main = "MacroInference: Arsenic Data")
+par(mar=c(5,5.2,4,2)+0.3) #changes left margin to make large labels fit
+	plot(arsn.macro$prior.fit$theta.vals, arsn.macro$prior.fit$ds.prior, 
+		type = "l", xlim = c(8,18.5),
+		lwd = 2, col = "red3", 
+		xlab = expression(theta), ylab = "", font.main = 1,
+		cex.lab=1.45, cex.axis=1.5, cex.main= 1.75, cex.sub=1.5,
+		main = "MacroInference: Arsenic Data")
+	title(ylab = expression(paste(hat(pi)(theta))), line = 2.3, cex.lab=1.45)
+		points(arsn.macro$model.modes[2],-.02, col = "green", pch = 17, cex = 1.5)
+		axis(1, at=seq(arsn.macro$model.modes[2]-arsn.macro$mode.sd[2], 
+		    arsn.macro$model.modes[2]+arsn.macro$mode.sd[2],
+		    length= (3-2) * 20),tick=TRUE, col="goldenrod4", labels = F, tck=-0.015)
 
 ## ------------------------------------------------------------------------
 data(ChildIll)

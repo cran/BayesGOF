@@ -1,6 +1,6 @@
 DS.macro.inf.nnu <-
-function(DS.GF.obj, num.modes =1 , iters = 500, 
-						 method = c("mean","mode")){
+function(DS.GF.obj, num.modes =1 , iters = 25, 
+						 method = c("mean","mode"), pred.type = c("posterior","prior")){
 
 # INPUTS
 #  DS.GF.obj		AutoBayes-DataCorrect object
@@ -12,8 +12,6 @@ function(DS.GF.obj, num.modes =1 , iters = 500,
 #  mode.sd			standard deviation of modes (generated through simulation)
 #  prior.fit		dataframe of prior information for plotting
 #  boot.modes/means	bootstrap mode or mean for simulation
-	#require(bbmle)
-	#LP.type = match.arg(DS.GF.obj$LP.type)
 	lambda.i <- function(s.i, tau.2){s.i^2/(s.i^2+tau.2)}
 	switch(DS.GF.obj$LP.type,
 		"L2" = {
@@ -34,14 +32,16 @@ function(DS.GF.obj, num.modes =1 , iters = 500,
 			while(len.mode != num.modes){
 				par.g <- c(NA,NA)
 				while(!is.finite(par.g[1])==TRUE | !is.finite(par.g[2])==TRUE){
-					samps <- DS.sampler(k = dim(DS.GF.obj$obs.data)[1], g.par = DS.GF.obj$g.par, 
-										   LP.par = DS.GF.obj$LP.par, con.prior = "Normal", LP.type = DS.GF.obj$LP.type)  #Correct SD: sqrt()
-					y.new<-NULL
-					for(j in 1:dim(DS.GF.obj$obs.data)[1]){
-						y.new[j] <- rnorm(1, samps[j], sd = DS.GF.obj$obs.data$se[j])
+					ifelse(pred.type == "posterior", new.df <- rPPD.ds(DS.GF.obj,1,pred.type = "posterior")$first.set,
+														 new.df <- rPPD.ds(DS.GF.obj,1, pred.type = "prior")$first.set)
+					possibleError <- tryCatch(par.g <- gMLE.nn(new.df$y, new.df$se, fixed = FALSE, method = "DL")$estimate,
+												error = function(e) e )
+					er.check <- !inherits(possibleError, "error")
+					if(er.check == TRUE){
+						par.g <- gMLE.nn(new.df$y, new.df$se, fixed = FALSE, method = "DL")$estimate
+						} else {
+							par.g <- c(NA, NA)
 						}
-					new.df<- data.frame(y = y.new, se = DS.GF.obj$obs.data$se)
-					par.g <- gMLE.nn(new.df$y, new.df$se, fixed = FALSE, method = "DL")$estimate
 					}			
 				new.LPc <- DS.prior.nnu(new.df, max.m = m.new, 
 							    start.par = par.g)
@@ -74,15 +74,17 @@ function(DS.GF.obj, num.modes =1 , iters = 500,
 			for(i in 1:iters){
 				par.g <- c(NA,NA)
 				while(!is.finite(par.g[1])==TRUE | !is.finite(par.g[2])==TRUE){
-					samps <- DS.sampler(k = dim(DS.GF.obj$obs.data)[1], g.par = DS.GF.obj$g.par, 
-										   LP.par = DS.GF.obj$LP.par, con.prior = "Normal", LP.type = DS.GF.obj$LP.type)  
-					y.new<-NULL
-					for(j in 1:dim(DS.GF.obj$obs.data)[1]){
-						y.new[j] <- rnorm(1, samps[j], DS.GF.obj$obs.data$se[j])
+					ifelse(pred.type == "posterior", new.df <- rPPD.ds(DS.GF.obj,1,pred.type = "posterior")$first.set,
+													 new.df <- rPPD.ds(DS.GF.obj,1, pred.type = "prior")$first.set)
+					possibleError <- tryCatch(par.g <- gMLE.nn(new.df$y, new.df$se, fixed = FALSE, method = "DL")$estimate,
+												error = function(e) e )
+					er.check <- !inherits(possibleError, "error")
+					if(er.check == TRUE){
+						par.g <- gMLE.nn(new.df$y, new.df$se, fixed = FALSE, method = "DL")$estimate
+						} else {
+							par.g <- c(NA, NA)
 						}
-					new.df<- data.frame(y = y.new, se = DS.GF.obj$obs.data$se)
-					par.g <- gMLE.nn(new.df$y, new.df$se, fixed = FALSE, method = "DL")$estimate
-					}				
+					}		
 				new.LPc <- DS.prior.nnu(new.df, max.m = m.new, 
 							    start.par = par.g)
 				if(sum(new.LPc$LP.par^2) == 0){
@@ -122,27 +124,28 @@ function(DS.GF.obj, num.modes =1 , iters = 500,
 			while(L2.norm > L2.norm.thres){
 				par.g <- c(NA,NA)
 				while(!is.finite(par.g[1])==TRUE | !is.finite(par.g[2])==TRUE){
-					samps <- DS.sampler(k = dim(DS.GF.obj$obs.data)[1], g.par = DS.GF.obj$g.par, 
-										   LP.par = DS.GF.obj$LP.par, con.prior = "Normal", LP.type = DS.GF.obj$LP.type)  #Correct SD: sqrt()
-					y.new<-NULL
-					for(j in 1:dim(DS.GF.obj$obs.data)[1]){
-						y.new[j] <- rnorm(1, samps[j], sd = DS.GF.obj$obs.data$se[j])
+					ifelse(pred.type == "posterior", new.df <- rPPD.ds(DS.GF.obj,1,pred.type = "posterior")$first.set,
+														 new.df <- rPPD.ds(DS.GF.obj,1, pred.type = "prior")$first.set)
+
+					possibleError <- tryCatch(par.g <- gMLE.nn(new.df$y, new.df$se, fixed = FALSE, method = "DL")$estimate,
+												error = function(e) e )
+					er.check <- !inherits(possibleError, "error")
+					if(er.check == TRUE){
+						par.g <- gMLE.nn(new.df$y, new.df$se, fixed = FALSE, method = "DL")$estimate
+						} else {
+							par.g <- c(NA, NA)
 						}
-					new.df<- data.frame(y = y.new, se = DS.GF.obj$obs.data$se)
-					par.g <- gMLE.nn(new.df$y, new.df$se, fixed = FALSE, method = "DL")$estimate
 					}			
 				new.LPc <- DS.prior.nnu(new.df, max.m = m.new, 
 							    start.par = par.g)
 				L2.norm <- sqrt(sum((new.LPc$LP.par)^2))
 				}
 			if(sum(new.LPc$LP.par^2) == 0){ 
-				  #new.LPc <- new.LPc
-				   modes.new <- new.LPc$prior.fit$theta.vals[which.max(new.LPc$prior.fit$parm.prior)]
-				   #L2.norm <- 0	
-				} else {
-				   new.LP.ME <- maxent.obj.convert(new.LPc)
-				   modes.new <- Local.Mode(new.LP.ME$prior.fit$theta.vals, new.LP.ME$prior.fit$ds.prior)
-				}
+				modes.new <- new.LPc$prior.fit$theta.vals[which.max(new.LPc$prior.fit$parm.prior)]
+				 } else {
+					new.LP.ME <- maxent.obj.convert(new.LPc)
+					modes.new <- Local.Mode(new.LP.ME$prior.fit$theta.vals, new.LP.ME$prior.fit$ds.prior)
+					}
 			len.mode <- length(modes.new)
 				}
 		modes.mat[i,] <- modes.new
@@ -170,15 +173,18 @@ function(DS.GF.obj, num.modes =1 , iters = 500,
 				while(L2.norm > L2.norm.thres){
 					par.g <- c(NA,NA)
 					while(!is.finite(par.g[1])==TRUE | !is.finite(par.g[2])==TRUE){
-						samps <- DS.sampler(k = dim(DS.GF.obj$obs.data)[1], g.par = DS.GF.obj$g.par, 
-										   LP.par = DS.GF.obj$LP.par, con.prior = "Normal", LP.type = DS.GF.obj$LP.type)
-						y.new<-NULL
-						for(j in 1:dim(DS.GF.obj$obs.data)[1]){
-							y.new[j] <- rnorm(1, samps[j], DS.GF.obj$obs.data$se[j])
-							}
-						new.df<- data.frame(y = y.new, se = DS.GF.obj$obs.data$se)
-						par.g <- gMLE.nn(new.df$y, new.df$se, fixed = FALSE, method = "DL")$estimate
-						}
+						ifelse(pred.type == "posterior", new.df <- rPPD.ds(DS.GF.obj,1,pred.type = "posterior")$first.set,
+														 new.df <- rPPD.ds(DS.GF.obj,1, pred.type = "prior")$first.set)
+
+						possibleError <- tryCatch(par.g <- gMLE.nn(new.df$y, new.df$se, fixed = FALSE, method = "DL")$estimate,
+												error = function(e) e )
+						er.check <- !inherits(possibleError, "error")
+						if(er.check == TRUE){
+							par.g <- gMLE.nn(new.df$y, new.df$se, fixed = FALSE, method = "DL")$estimate
+							} else {
+								par.g <- c(NA, NA)
+								}
+					}
 				new.LPc <- DS.prior.nnu(new.df, max.m = m.new, 
 							    start.par = par.g)
 				L2.norm <- sqrt(sum((new.LPc$LP.par)^2))
@@ -191,7 +197,6 @@ function(DS.GF.obj, num.modes =1 , iters = 500,
 							  new.LP.ME$prior.fit$theta.vals*new.LP.ME$prior.fit$ds.prior)$int
 				}		
 			}		
-
 			out$boot.mean <- par.mean.vec
 			out$mean.sd <- sd(par.mean.vec)
 			out$prior.fit <- DS.GF.obj$prior.fit

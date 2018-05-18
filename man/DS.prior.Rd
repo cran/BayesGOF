@@ -20,7 +20,8 @@
 DS.prior(input, max.m = 8, g.par, 
          family = c("Normal","Binomial", "Poisson"), 
          LP.type = c("L2", "MaxEnt"), 
-         smooth.crit = "BIC", iters = 200, B = 1000)
+         smooth.crit = "BIC", iters = 200, B = 1000,
+		 max.theta = NULL)
 }
 \arguments{
   \item{input}{For \code{"Binomial"}, a dataframe that contains the \eqn{k} pairs of successes \eqn{y} and the corresponding total number of trials \eqn{n}.  For \code{"Normal"}, a dataframe that has the \eqn{k} means \eqn{y_i} in the first column and their respective standard errors \eqn{s_i} in the second.  For the \code{"Poisson"}, a vector of that includes the untabled count data.}
@@ -31,8 +32,8 @@ DS.prior(input, max.m = 8, g.par,
   \item{smooth.crit}{User selects either \code{"BIC"} or \code{"AIC"} as criteria to both determine optimal \eqn{m} and smooth final LP parameters; default is \code{"BIC"}.}
   \item{iters}{Integer value that gives the maximum number of iterations allowed for convergence; default is 200.}
   \item{B}{Integer value for number of grid points used for distribution output; default is 1000.}
-
-}
+  \item{max.theta}{For \code{"Poisson"}, user can provide a maximum theta value for prior; default is the maximum count value in \code{input}.}
+  }
 \details{ Function can take \eqn{m=0} and will return the Bayes estimate with given starting parameters.  Returns an object of class \code{DS.GF.obj}; this object can be used with plot command to plot the U-function (\code{Ufunc}), Deviance Plots (\code{mDev}), and DS-G comparison (\code{DS_G}).
 }
 \value{

@@ -82,7 +82,7 @@ plot(rat.y71.micro, main = "Rat (4,14)")
 
 ##II. Comparison of $\mathcal{L}^2$ and maximum entropy representations using galaxy data (Normal Family)
 
-This demonstration will compare the results using the default $\mathcal{L}^2$ representation of the estimated DS prior $\widehat{\pi}$ to the maximum entropy $\widehat{\breve{\pi}}$ representation.  We will use the galaxy data, which consists of $k=324$ observed rotation velocities $y_i$ and their uncertainties of Low Surface Brightness (LSB) galaxies.
+This demonstration will compare the results using the default $\mathcal{L}^2$ representation of the estimated DS prior $\widehat{\pi}$ to the maximum entropy $\breve{\pi}$ representation.  We will use the galaxy data, which consists of $k=324$ observed rotation velocities $y_i$ and their uncertainties of Low Surface Brightness (LSB) galaxies.
 
 **Step 1.** We begin by finding the starting parameter values for $g \sim Normal(\mu, \tau^2)$ by MLE:
 
@@ -113,7 +113,7 @@ plot(gal.ds.ME, plot.type = "DSg", main = "MaxEnt DS vs g")
 
 The U-function plots maintain a similar structure, but show some slight differences with respect to the two peaks.  The maximum entropy representation shows the first peak as more narrow, while the second peak is not as pronounced as the $\mathcal{L^2}$ representation.  We can see how those slight changes in the U-functions influence the resulting DS-prior in the "DS vs g" plots.  The maximum entropy representation has a more significant first peak, smaller second peak, and smoother tails.
 
-**Step 4.** Extract the parameters for the *corrected* priors: $\widehat{\pi}$ and $\widehat{\breve{\pi}}$:
+**Step 4.** Extract the parameters for the *corrected* priors: $\widehat{\pi}$ and $\breve{\pi}$:
 
 ```{r}
 gal.ds.L2
@@ -122,7 +122,7 @@ gal.ds.ME
 
 The DS prior in its $\mathcal{L}^2$ representation is: $$\widehat{\pi}(\theta) = g(\theta; \mu, \tau^2)\Big[1 + 0.21T_3(\theta;G)-0.20T_4(\theta;G)+0.41T_5(\theta;G)\Big] $$.
 
-The DS prior in its maximum entropy representation is: $$\widehat{\breve{\pi}}(\theta) = g(\theta; \mu, \tau^2)\exp\Big[-0.15 + 0.26T_3(\theta;G)-0.28T_4(\theta;G)+0.46T_5(\theta;G)\Big] $$
+The DS prior in its maximum entropy representation is: $$\breve{\pi}(\theta) = g(\theta; \mu, \tau^2)\exp\Big[-0.15 + 0.26T_3(\theta;G)-0.28T_4(\theta;G)+0.46T_5(\theta;G)\Big] $$
 
 ##III. Illustration using arsenic data (Normal Family)
 
@@ -149,13 +149,13 @@ arsn.ds <- DS.prior(arsenic, max.m = 4, arsn.start, family = "Normal", LP.type =
 plot(arsn.ds, plot.type = "Ufunc")
 ```
 
-**Step 3.** We now extract the parameters for the *corrected* prior $\widehat{\breve{\pi}}$ and plot it, along with the original $g$:
+**Step 3.** We now extract the parameters for the *corrected* prior $\breve{\pi}$ and plot it, along with the original $g$:
 
 ```{r}
 arsn.ds
 ```
 
-The resulting equation for $\widehat{\breve{\pi}}(\theta)$ is: $$\widehat{\breve{\pi}}(\theta) = g(\theta; \mu, \tau^2)\exp\Big[-0.48 - 0.65T_2(\theta;G)-0.71T_3(\theta;G)+0.42T_4(\theta;G)\Big] $$
+The resulting equation for $\breve{\pi}(\theta)$ is: $$\breve{\pi}(\theta) = g(\theta; \mu, \tau^2)\exp\Big[-0.48 - 0.65T_2(\theta;G)-0.71T_3(\theta;G)+0.42T_4(\theta;G)\Big] $$
 
 ```{r,fig.height = 5.5, fig.width = 5.5,fig.align = 'center'}
 plot(arsn.ds, plot.type = "DSg", main = "DS vs g: Arsenic")
@@ -172,14 +172,25 @@ arsn.macro <- DS.macro.inf(arsn.ds, num.modes = 2, iters = 25, method = "mode")
 arsn.macro
 ```
 
-Based on our results, we find two significant modes.  Therefore, the prior shows structured heterogeneity and requires both modes to describe the distribution and its two groups.  In this cases, though, we are looking to estimate the consensus value of the measurand and its uncertainty.  Therefore, we would select the dominant mode.  To find the dominant mode, we plot the macroinference results:
+Based on our results, we find two significant modes.  Therefore, the prior shows structured heterogeneity and requires both modes to describe the distribution and its two groups.  In this case, though, we are looking to estimate the consensus value of the measurand and its uncertainty.  Therefore, we would select the dominant mode, which requires the macroinference results:
 
 ```{r, fig.height = 5.5, fig.width = 5.5,fig.align = 'center'}
-
-plot(arsn.macro, main = "MacroInference: Arsenic Data")
+#plot(arsn.macro, main = "MacroInference: Arsenic Data")
+par(mar=c(5,5.2,4,2)+0.3) #changes left margin to make large labels fit
+	plot(arsn.macro$prior.fit$theta.vals, arsn.macro$prior.fit$ds.prior, 
+		type = "l", xlim = c(8,18.5),
+		lwd = 2, col = "red3", 
+		xlab = expression(theta), ylab = "", font.main = 1,
+		cex.lab=1.45, cex.axis=1.5, cex.main= 1.75, cex.sub=1.5,
+		main = "MacroInference: Arsenic Data")
+	title(ylab = expression(paste(hat(pi)(theta))), line = 2.3, cex.lab=1.45)
+		points(arsn.macro$model.modes[2],-.02, col = "green", pch = 17, cex = 1.5)
+		axis(1, at=seq(arsn.macro$model.modes[2]-arsn.macro$mode.sd[2], 
+		    arsn.macro$model.modes[2]+arsn.macro$mode.sd[2],
+		    length= (3-2) * 20),tick=TRUE, col="goldenrod4", labels = F, tck=-0.015)
 ```
 
-Based on the plot, the dominant mode and our consensus value for the measurand is 13.6 with a standard error (using smooth bootstrap) of 0.25. 
+The plot shows the dominant mode and our consensus value for the measurand is 13.6 with a standard error (using smooth bootstrap) of 0.25.  This mode is resistant to any extreme low measurements and achieves a slightly more accurate result than the standard PEB estimate ($13.22 \pm 0.25$). 
 
 ##IV. Illustration using child illness data (Poisson Family)
 

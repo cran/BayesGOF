@@ -1,6 +1,6 @@
 DS.macro.inf.bbu <-
-function(DS.GF.obj, num.modes =1 , iters = 500, 
-						 method = c("mean","mode")){
+function(DS.GF.obj, num.modes =1 , iters = 25, 
+						 method = c("mean","mode"), pred.type = c("posterior","prior")){
 
 # INPUTS
 #  DS.GF.obj		AutoBayes-DataCorrect object
@@ -12,21 +12,6 @@ function(DS.GF.obj, num.modes =1 , iters = 500,
 #  mode.sd			standard deviation of modes (generated through simulation)
 #  prior.fit		dataframe of prior information for plotting
 #  boot.modes/means	bootstrap mode or mean for simulation
-#### Declare Functions used in Macro
-	test.distname <- "betabinom.ab"
-	test.ddistname <- paste("d", test.distname, sep = "")
-	fnobj.test <- function(par, x, n, test.ddistnam) {
-		-sum(do.call(test.ddistnam, c(list(x), list(n), par, log = TRUE)))
-				}
-	mom.est <- function(success, trials){
-						start.mu <- mean(success/trials)
-						start.var <- var(success/trials)
-						start.a <- ((1 - start.mu) / start.var - 1 / start.mu) * start.mu ^ 2
-						start.b <- start.a * (1 / start.mu - 1)
-						start.vals <- c(start.a, start.b)
-					return(start.vals)
-				}
-###########
 	switch(DS.GF.obj$LP.type,
 		"L2" = {
 	method = match.arg(method)
@@ -46,19 +31,16 @@ function(DS.GF.obj, num.modes =1 , iters = 500,
 			while(len.mode != num.modes){
 				par.g <- c(NA,NA)
 				while(!is.finite(par.g[1])==TRUE | !is.finite(par.g[2])==TRUE){
-					log.lik.test <- NA
-					while(!is.finite(log.lik.test)==TRUE){
-						samps <- DS.sampler(k = dim(DS.GF.obj$obs.data)[1], g.par = DS.GF.obj$g.par, 
-										   LP.par = DS.GF.obj$LP.par, con.prior = "Beta", LP.type = DS.GF.obj$LP.type)  
-						y.new<-NULL
-						for(j in 1:dim(DS.GF.obj$obs.data)[1]){
-							y.new[j] <- rbinom(1, DS.GF.obj$obs.data$n[j], samps[j])
-							}
-						new.df<- data.frame(y = y.new, n = DS.GF.obj$obs.data$n)
-						test.start <- mom.est(new.df$y, new.df$n)
-						log.lik.test <- fnobj.test(test.start, new.df$y, new.df$n, test.ddistname)
+					ifelse(pred.type == "posterior", new.df <- rPPD.ds(DS.GF.obj,1,pred.type = "posterior")$first.set,
+													 new.df <- rPPD.ds(DS.GF.obj,1, pred.type = "prior")$first.set)
+					possibleError <- tryCatch(par.g <- gMLE.bb(new.df$y, new.df$n)$estimate,
+												error = function(e) e )
+					er.check <- !inherits(possibleError, "error")
+					if(er.check == TRUE){
+						par.g <- gMLE.bb(new.df$y, new.df$n)$estimate
+						} else {
+						par.g <- c(NA, NA)
 						}
-					par.g <- gMLE.bb(new.df$y, new.df$n)$estimate
 					}			
 				new.LPc <- DS.prior.bbu(new.df, max.m = m.new, 
 							    start.par = par.g)
@@ -91,20 +73,16 @@ function(DS.GF.obj, num.modes =1 , iters = 500,
 			for(i in 1:iters){
 				par.g <- c(NA,NA)
 				while(!is.finite(par.g[1])==TRUE | !is.finite(par.g[2])==TRUE){
-					log.lik.test <- NA
-					while(!is.finite(log.lik.test)==TRUE){
-						samps <- DS.sampler(k = dim(DS.GF.obj$obs.data)[1], g.par = DS.GF.obj$g.par, 
-										   LP.par = DS.GF.obj$LP.par, con.prior = "Beta", LP.type = DS.GF.obj$LP.type)  
-						y.new<-NULL
-						for(j in 1:dim(DS.GF.obj$obs.data)[1]){
-							y.new[j] <- rbinom(1, DS.GF.obj$obs.data$n[j], samps[j])
-							}
-						new.df<- data.frame(y = y.new, n = DS.GF.obj$obs.data$n)
-						test.start <- mom.est(new.df$y, new.df$n)
-						log.lik.test <- fnobj.test(test.start, new.df$y, new.df$n, test.ddistname)
-						log.lik.test
+					ifelse(pred.type == "posterior", new.df <- rPPD.ds(DS.GF.obj,1,pred.type = "posterior")$first.set,
+													 new.df <- rPPD.ds(DS.GF.obj,1, pred.type = "prior")$first.set)
+					possibleError <- tryCatch(par.g <- gMLE.bb(new.df$y, new.df$n)$estimate,
+												error = function(e) e )
+					er.check <- !inherits(possibleError, "error")
+					if(er.check == TRUE){
+						par.g <- gMLE.bb(new.df$y, new.df$n)$estimate
+						} else {
+						par.g <- c(NA, NA)
 						}
-					par.g <- gMLE.bb(new.df$y, new.df$n)$estimate
 					}				
 				new.LPc <- DS.prior.bbu(new.df, max.m = m.new, 
 							    start.par = par.g)
@@ -144,29 +122,24 @@ function(DS.GF.obj, num.modes =1 , iters = 500,
 			while(L2.norm > L2.norm.thres){
 				par.g <- c(NA,NA)
 				while(!is.finite(par.g[1])==TRUE | !is.finite(par.g[2])==TRUE){
-					log.lik.test <- NA
-					while(!is.finite(log.lik.test)==TRUE){
-						samps <- DS.sampler(k = dim(DS.GF.obj$obs.data)[1], g.par = DS.GF.obj$g.par, 
-										   LP.par = DS.GF.obj$LP.par, con.prior = "Beta", LP.type = DS.GF.obj$LP.type)  
-						y.new<-NULL
-						for(j in 1:dim(DS.GF.obj$obs.data)[1]){
-							y.new[j] <- rbinom(1, DS.GF.obj$obs.data$n[j], samps[j])
-							}
-						new.df<- data.frame(y = y.new, n = DS.GF.obj$obs.data$n)
-						test.start <- mom.est(new.df$y, new.df$n)
-						log.lik.test <- fnobj.test(test.start, new.df$y, new.df$n, test.ddistname)
+					ifelse(pred.type == "posterior", new.df <- rPPD.ds(DS.GF.obj,1,pred.type = "posterior")$first.set,
+													 new.df <- rPPD.ds(DS.GF.obj,1, pred.type = "prior")$first.set)
+					possibleError <- tryCatch(par.g <- gMLE.bb(new.df$y, new.df$n)$estimate,
+												error = function(e) e )
+					er.check <- !inherits(possibleError, "error")
+					if(er.check == TRUE){
+						par.g <- gMLE.bb(new.df$y, new.df$n)$estimate
+						} else {
+						par.g <- c(NA, NA)
 						}
-					par.g <- gMLE.bb(new.df$y, new.df$n)$estimate
 					}			
 				new.LPc <- DS.prior.bbu(new.df, max.m = m.new, 
 							    start.par = par.g)
 				L2.norm <- sqrt(sum((new.LPc$LP.par)^2))
 				}
 				if(sum(new.LPc$LP.par^2) == 0){ 
-				  #new.LPc <- new.LPc
 				   modes.new <- new.LPc$prior.fit$theta.vals[which.max(new.LPc$prior.fit$parm.prior)]
-				   #L2.norm <- 0	
-				} else {
+				   } else {
 				   new.LP.ME <- maxent.obj.convert(new.LPc)
 				   modes.new <- Local.Mode(new.LP.ME$prior.fit$theta.vals, new.LP.ME$prior.fit$ds.prior)
 				}
@@ -197,20 +170,16 @@ function(DS.GF.obj, num.modes =1 , iters = 500,
 				while(L2.norm > L2.norm.thres){
 					par.g <- c(NA,NA)
 					while(!is.finite(par.g[1])==TRUE | !is.finite(par.g[2])==TRUE){
-						log.lik.test <- NA
-						while(!is.finite(log.lik.test)==TRUE){
-							samps <- DS.sampler(k = dim(DS.GF.obj$obs.data)[1], g.par = DS.GF.obj$g.par, 
-										   LP.par = DS.GF.obj$LP.par, con.prior = "Beta", LP.type = DS.GF.obj$LP.type)  
-							y.new<-NULL
-							for(j in 1:dim(DS.GF.obj$obs.data)[1]){
-								y.new[j] <- rbinom(1, DS.GF.obj$obs.data$n[j], samps[j])
-								}
-							new.df<- data.frame(y = y.new, n = DS.GF.obj$obs.data$n)
-							test.start <- mom.est(new.df$y, new.df$n)
-							log.lik.test <- fnobj.test(test.start, new.df$y, new.df$n, test.ddistname)
-							log.lik.test
+						ifelse(pred.type == "posterior", new.df <- rPPD.ds(DS.GF.obj,1,pred.type = "posterior")$first.set,
+									   					 new.df <- rPPD.ds(DS.GF.obj,1, pred.type = "prior")$first.set)
+						possibleError <- tryCatch(par.g <- gMLE.bb(new.df$y, new.df$n)$estimate,
+												error = function(e) e )
+						er.check <- !inherits(possibleError, "error")
+						if(er.check == TRUE){
+							par.g <- gMLE.bb(new.df$y, new.df$n)$estimate
+							} else {
+								par.g <- c(NA, NA)
 							}
-						par.g <- gMLE.bb(new.df$y, new.df$n)$estimate
 						}				
 				new.LPc <- DS.prior.bbu(new.df, max.m = m.new, 
 							    start.par = par.g)

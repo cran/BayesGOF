@@ -1,5 +1,5 @@
 DS.posterior.reduce <-
-function(DS.GF.obj, exp.vec = NULL){
+function(DS.GF.obj, exposure = NULL){
 	#colnames(reduce.mat) <- c("PEB_MN", "DS_MN", "PEB_MD", "DS_MD")
 	fam = DS.GF.obj$fam
 	switch(fam,
@@ -18,7 +18,7 @@ function(DS.GF.obj, exp.vec = NULL){
 			cnt.vec <- as.integer(unlist(dimnames(tbl)))
 			cnt.vec <- c(min(cnt.vec):max(cnt.vec))
 			reduce.mat <- matrix(0, ncol = 4, nrow = length(cnt.vec))
-			if(is.null(exp.vec) == TRUE){
+			if(is.null(exposure) == TRUE){
 				for(i in 1:length(cnt.vec)){
 					reduce.mat[i,] <- DS.micro.inf.pgu(DS.GF.obj,
 									y.0 = cnt.vec[i])$post.vec
@@ -26,7 +26,7 @@ function(DS.GF.obj, exp.vec = NULL){
 				} else {
 				for(i in 1:length(cnt.vec)){
 					reduce.mat[i,] <- DS.micro.inf.pge(DS.GF.obj,
-									y.0 = cnt.vec[i], e.0 = exp.vec[i])$post.vec
+									y.0 = cnt.vec[i], e.0 = exposure[i])$post.vec
 					}				
 				}
 			} 

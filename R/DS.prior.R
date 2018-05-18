@@ -1,6 +1,6 @@
 DS.prior <-
 function(input, max.m = 8, g.par,  family = c("Normal","Binomial", "Poisson"),
-			LP.type = c("L2","MaxEnt"), smooth.crit = "BIC", iters = 200, B = 1000){
+			LP.type = c("L2","MaxEnt"), smooth.crit = "BIC", iters = 200, B = 1000, max.theta = NULL){
 ####iterates through given conditions to find c-vector
 #### INPUTS		
 #### yn.df 			dataframe with 1st column as predictions for X from each of k servers
@@ -36,7 +36,7 @@ function(input, max.m = 8, g.par,  family = c("Normal","Binomial", "Poisson"),
 		 "Poisson" = {
 			DS.prior.pgu(vec.counts = input, max.m = max.m , start.par= g.par, 
 						 iter.c = iters, B = B, smooth.crit = smooth.crit,
-						 LP.type = meth)
+						 LP.type = meth, max.theta = max.theta)
 				}
 			 
 		)

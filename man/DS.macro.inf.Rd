@@ -18,7 +18,7 @@ A function that generates macro-estimates with their uncertainty (standard error
 \usage{
 DS.macro.inf(DS.GF.obj, num.modes = 1, 
              method = c("mean", "mode"), 
-             iters = 25, e.vec = NULL)
+             iters = 25, exposure = NULL)
 }
 
 \arguments{
@@ -26,7 +26,7 @@ DS.macro.inf(DS.GF.obj, num.modes = 1,
   \item{num.modes}{The number of modes indicated by \code{DS.prior} object.}
   \item{method}{Returns mean or mode(s) (based on user choice) along with the associated standard error(s).}
   \item{iters}{Integer value of total number of iterations.}
-  \item{e.vec}{In the case where \code{DS.GF.obj} is from a Poisson family with exposure, \code{e.vec} is the vector of exposures.  Otherwise, the default is \code{NULL}.}
+  \item{exposure}{In the case where \code{DS.GF.obj} is from a Poisson family with exposure, \code{exposure} is the vector of exposures.  Otherwise, the default is \code{NULL}.}
  
  }
 

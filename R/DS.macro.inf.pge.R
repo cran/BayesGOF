@@ -1,6 +1,6 @@
 DS.macro.inf.pge <- 
-function(DS.GF.obj, num.modes = 1, e.vec, iters = 25, 
-						 method = c("mean","mode") ){
+function(DS.GF.obj, num.modes = 1, exposure, iters = 25, 
+						 method = c("mean","mode"), pred.type = c("posterior","prior") ){
 # INPUTS
 #  DS.GF.obj		AutoBayes-DataCorrect object
 #  num.modes		For mode inference: number of modes expected
@@ -34,15 +34,19 @@ switch(DS.GF.obj$LP.type,
 	while(len.mode != num.modes){
 		par.g <- c(NA,NA)
 		while(!is.finite(par.g[1])==TRUE | !is.finite(par.g[2])==TRUE){
-			samps <- DS.sampler(k = length(DS.GF.obj$obs.data), g.par = DS.GF.obj$g.par, 
-										   LP.par = DS.GF.obj$LP.par, con.prior = "Gamma", LP.type = DS.GF.obj$LP.type)  			
-			y.new<-NULL
-			for(j in 1:length(DS.GF.obj$obs.data)){
-					y.new[j] <- rpois(1, samps[j]*e.vec[j])
+			ifelse(pred.type == "posterior", new.df <- rPPD.ds(DS.GF.obj,1,pred.type = "posterior", exposure = exposure)$first.set,
+														 new.df <- rPPD.ds(DS.GF.obj,1, pred.type = "prior", exposure = exposure)$first.set)
+
+			possibleError <- tryCatch(par.g <- gMLE.pg(new.df, exposure = exposure, start.par = DS.GF.obj$g.par),
+												error = function(e) e )
+			er.check <- !inherits(possibleError, "error")
+			if(er.check == TRUE){
+				par.g <- gMLE.pg(new.df, exposure = exposure, start.par = DS.GF.obj$g.par)
+				} else {
+					par.g <- c(NA, NA)
 					}
-			par.g <- gMLE.pg(y.new, start.par = DS.GF.obj$g.par, e.vec = e.vec)
 			}		
-		new.LPc <- DS.prior.pgu(y.new/e.vec, max.m = m.new, start.par = par.g)
+		new.LPc <- DS.prior.pgu(new.df/exposure, max.m = m.new, start.par = par.g)
 		if(sum(new.LPc$LP.par^2) == 0){
 			modes.new <- Local.Mode(new.LPc$prior.fit$theta.vals, new.LPc$prior.fit$parm.prior)
 			} else {
@@ -72,15 +76,19 @@ switch(DS.GF.obj$LP.type,
 			for(i in 1:iters){
 				par.g <- c(NA,NA)
 				while(!is.finite(par.g[1])==TRUE | !is.finite(par.g[2])==TRUE){
-					samps <- DS.sampler(k = length(DS.GF.obj$obs.data), g.par = DS.GF.obj$g.par, 
-										   LP.par = DS.GF.obj$LP.par, con.prior = "Gamma", LP.type = DS.GF.obj$LP.type)  			
-					y.new<-NULL
-					for(j in 1:length(DS.GF.obj$obs.data)){
-					y.new[j] <- rpois(1, samps[j]*e.vec[j])
-							}
-					par.g <- gMLE.pg(y.new, start.par = DS.GF.obj$g.par, e.vec = e.vec)
-				}	
-				new.LPc <- DS.prior.pgu(y.new/e.vec, max.m = m.new, 
+					ifelse(pred.type == "posterior", new.df <- rPPD.ds(DS.GF.obj,1,pred.type = "posterior", exposure = exposure)$first.set,
+														 new.df <- rPPD.ds(DS.GF.obj,1, pred.type = "prior", exposure = exposure)$first.set)
+
+					possibleError <- tryCatch(par.g <- gMLE.pg(new.df, exposure = exposure, start.par = DS.GF.obj$g.par),
+												error = function(e) e )
+					er.check <- !inherits(possibleError, "error")
+					if(er.check == TRUE){
+							par.g <- gMLE.pg(new.df, exposure = exposure, start.par = DS.GF.obj$g.par)
+						} else {
+							par.g <- c(NA, NA)
+						}
+					}	
+				new.LPc <- DS.prior.pgu(new.df/exposure, max.m = m.new, 
 							    start.par = par.g)
 				if(sum(new.LPc$LP.par^2) == 0){
 					par.mean.vec[i] <- par.g[1]*par.g[2]
@@ -129,22 +137,24 @@ switch(DS.GF.obj$LP.type,
 				while(L2.norm > L2.norm.thres){
 				par.g <- c(NA,NA)
 				while(!is.finite(par.g[1])==TRUE | !is.finite(par.g[2])==TRUE){
-					samps <- DS.sampler(k = length(DS.GF.obj$obs.data), g.par = DS.GF.obj$g.par, 
-										   LP.par = DS.GF.obj$LP.par, con.prior = "Gamma", LP.type = DS.GF.obj$LP.type)  
-					y.new<-NULL
-					for(j in 1:length(DS.GF.obj$obs.data)){
-						y.new[j] <- rpois(1, samps[j]*e.vec[j])
-							}
-					par.g <- gMLE.pg(y.new, start.par = DS.GF.obj$g.par, e.vec = e.vec)
+					ifelse(pred.type == "posterior", new.df <- rPPD.ds(DS.GF.obj,1,pred.type = "posterior", exposure = exposure)$first.set,
+														 new.df <- rPPD.ds(DS.GF.obj,1, pred.type = "prior", exposure = exposure)$first.set)
+
+					possibleError <- tryCatch(par.g <- gMLE.pg(new.df, exposure = exposure, start.par = DS.GF.obj$g.par),
+												error = function(e) e )
+					er.check <- !inherits(possibleError, "error")
+					if(er.check == TRUE){
+							par.g <- gMLE.pg(new.df, exposure = exposure, start.par = DS.GF.obj$g.par)
+						} else {
+							par.g <- c(NA, NA)
+						}
 					}
-				new.LPc <- DS.prior.pgu(y.new/e.vec, max.m = m.new, start.par = par.g)
+				new.LPc <- DS.prior.pgu(new.df/exposure, max.m = m.new, start.par = par.g)
 				L2.norm <- sqrt(sum((new.LPc$LP.par)^2))
 				}
 				if(sum(new.LPc$LP.par^2) == 0){ 
-				  #new.LPc <- new.LPc
 				   modes.new <- new.LPc$prior.fit$theta.vals[which.max(new.LPc$prior.fit$parm.prior)]
-				   #L2.norm <- 0	
-				} else {
+					} else {
 				   new.LP.ME <- maxent.obj.convert(new.LPc)
 				   modes.new <- Local.Mode(new.LP.ME$prior.fit$theta.vals, new.LP.ME$prior.fit$ds.prior)
 				}
@@ -175,15 +185,19 @@ switch(DS.GF.obj$LP.type,
 				while(L2.norm > L2.norm.thres){
 					par.g <- c(NA,NA)
 					while(!is.finite(par.g[1])==TRUE | !is.finite(par.g[2])==TRUE){
-						samps <- DS.sampler(k = length(DS.GF.obj$obs.data), g.par = DS.GF.obj$g.par, 
-										   LP.par = DS.GF.obj$LP.par, con.prior = "Gamma", LP.type = DS.GF.obj$LP.type)  
-						y.new<-NULL
-						for(j in 1:length(DS.GF.obj$obs.data)){
-							y.new[j] <- rpois(1, samps[j]*e.vec[j])
-								}
-						par.g <- gMLE.pg(y.new, start.par = DS.GF.obj$g.par, e.vec = e.vec)
+						ifelse(pred.type == "posterior", new.df <- rPPD.ds(DS.GF.obj,1,pred.type = "posterior", exposure = exposure)$first.set,
+														 new.df <- rPPD.ds(DS.GF.obj,1, pred.type = "prior", exposure = exposure)$first.set)
+
+						possibleError <- tryCatch(par.g <- gMLE.pg(new.df, exposure = exposure, start.par = DS.GF.obj$g.par),
+												error = function(e) e )
+						er.check <- !inherits(possibleError, "error")
+						if(er.check == TRUE){
+							par.g <- gMLE.pg(new.df, exposure = exposure, start.par = DS.GF.obj$g.par)
+						} else {
+							par.g <- c(NA, NA)
 						}
-				new.LPc <- DS.prior.pgu(y.new/e.vec, max.m = m.new, 
+						}
+				new.LPc <- DS.prior.pgu(new.df/exposure, max.m = m.new, 
 							    start.par = par.g)
 				L2.norm <- sqrt(sum((new.LPc$LP.par)^2))
 				}

@@ -5,11 +5,11 @@ Posterior Expectation and Modes of DS object
 }
 \description{ A function that determines the posterior expectations \eqn{E(\theta_0 | y_0)} and posterior modes for a set of observed data.}
 \usage{
-DS.posterior.reduce(DS.GF.obj, exp.vec)
+DS.posterior.reduce(DS.GF.obj, exposure)
 }
 \arguments{
    \item{DS.GF.obj}{Object resulting from running DS.prior function on a data set.}
-   \item{exp.vec}{In the case of the Poisson family with exposure, represents the exposure values for the count data.}
+   \item{exposure}{In the case of the Poisson family with exposure, represents the exposure values for the count data.}
 
 }
 

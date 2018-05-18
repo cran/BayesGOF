@@ -7,13 +7,13 @@
 Computes Type-II Maximum likelihood estimates \eqn{\hat{\alpha}} and \eqn{\hat{\beta}} for gamma prior \eqn{g\sim} Gamma\eqn{(\alpha, \beta)}.  
 }
 \usage{
-gMLE.pg(cnt.vec, e.vec = NULL, start.par = c(1,1))
+gMLE.pg(cnt.vec, exposure = NULL, start.par = c(1,1))
 
 }
 
 \arguments{
   \item{cnt.vec}{Vector containing Poisson counts.}
-  \item{e.vec}{Vector containing exposures for each count.  The default is no exposure, thus \code{e.vec = NULL}.}
+  \item{exposure}{Vector containing exposures for each count.  The default is no exposure, thus \code{exposure = NULL}.}
   \item{start.par}{Initial values that will pass to \code{optim}.}
   
 }
@@ -37,6 +37,6 @@ ill.start
 data(NorbergIns)
 X <- NorbergIns$deaths
 E <- NorbergIns$exposure/344
-norb.start <- gMLE.pg(X, e.vec = E)
+norb.start <- gMLE.pg(X, exposure = E)
 norb.start
 }

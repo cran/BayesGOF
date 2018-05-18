@@ -1,6 +1,7 @@
 DS.prior.pgu <- 
 function(vec.counts, max.m = 8, start.par, iter.c = 200,
-						B = 1000, smooth.crit = "BIC", LP.type = c("L2","MaxEnt")){
+						B = 1000, smooth.crit = "BIC", 
+						LP.type = c("L2","MaxEnt"), max.theta = NULL){
 			LP.type <- match.arg(LP.type)
 			fam <- "Poisson"
 			out <- list()
@@ -9,7 +10,7 @@ function(vec.counts, max.m = 8, start.par, iter.c = 200,
 			tbl <- table(vec.counts)
 			cnt.vec <- as.integer(unlist(dimnames(tbl)))
 			freq.vec <- as.vector(tbl)
-			max.cnt <- max(cnt.vec)
+			max.cnt <- ifelse(is.null(max.theta)==TRUE, max(cnt.vec),max.theta)
 			#PEB g
 			if(dgamma(0, start.par[1], scale = start.par[2]) != Inf){
 				theta.vals <- seq(0,max.cnt, length.out = B)

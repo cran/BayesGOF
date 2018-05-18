@@ -1,6 +1,7 @@
 \name{DS.sampler}
 \alias{DS.sampler}
 \alias{DS.sampler.post}
+\alias{rPPD.ds}
 \title{
 Samples data from DS(G,m) distribution.
 }
