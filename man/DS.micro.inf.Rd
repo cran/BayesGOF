@@ -33,8 +33,7 @@ DS.micro.inf(DS.GF.obj, y.0, n.0, e.0 = NULL)
 
   }
 \references{
-Mukhopadhyay, S. and Fletcher, D., 2018. "Bayesian Modeling via Goodness-of-Fit," Technical report, \url{https://arxiv.org/abs/1802.00474 }.
-}
+Mukhopadhyay, S. and Fletcher, D., 2018. "Generalized Empirical Bayes via Frequentist Goodness of Fit," Technical report, \emph{Scientific Reports}, 8(1), p.9983, \url{https://www.nature.com/articles/s41598-018-28130-5 }.}
 \author{Doug Fletcher, Subhadeep Mukhopadhyay}
 \examples{
 ### MicroInference for Naval Shipyard Data: sample where y = 0 and n = 5

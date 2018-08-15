@@ -52,8 +52,7 @@ DS.prior(input, max.m = 8, g.par,
   
   }
 \references{
-Mukhopadhyay, S. and Fletcher, D., 2018. "Bayesian Modeling via Goodness-of-Fit," Technical report, \url{https://arxiv.org/abs/1802.00474 }.
-
+Mukhopadhyay, S. and Fletcher, D., 2018. "Generalized Empirical Bayes via Frequentist Goodness of Fit," Technical report, \emph{Scientific Reports}, 8(1), p.9983, \url{https://www.nature.com/articles/s41598-018-28130-5 }.
 Mukhopadhyay, S., 2017. "Large-Scale Mode Identification and Data-Driven Sciences," \emph{Electronic Journal of Statistics, 11}(1), pp.215-240.
 
 }

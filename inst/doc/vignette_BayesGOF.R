@@ -18,7 +18,7 @@ rat.ds
 plot(rat.ds, plot.type = "DSg", main = "DS vs g: Rat")
 
 ## ---- warning = FALSE----------------------------------------------------
-rat.macro.md <- DS.macro.inf(rat.ds, num.modes = 2 , iters = 25, method = "mode") 
+rat.macro.md <- DS.macro.inf(rat.ds, num.modes = 2 , iters = 20, method = "mode") 
 
 ## ------------------------------------------------------------------------
 rat.macro.md
@@ -69,7 +69,7 @@ arsn.ds
 plot(arsn.ds, plot.type = "DSg", main = "DS vs g: Arsenic")
 
 ## ---- warning = FALSE----------------------------------------------------
-arsn.macro <- DS.macro.inf(arsn.ds, num.modes = 2, iters = 25, method = "mode")
+arsn.macro <- DS.macro.inf(arsn.ds, num.modes = 2, iters = 20, method = "mode")
 
 ## ------------------------------------------------------------------------
 arsn.macro

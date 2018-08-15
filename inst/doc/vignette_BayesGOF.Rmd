@@ -58,7 +58,7 @@ plot(rat.ds, plot.type = "DSg", main = "DS vs g: Rat")
 **Step 4.** Here we are interested in the *overall* macro-level inference by combining the $k=70$ parallel studies. The group-specific modes along with their standard errors are computed as follows:
 
 ```{r, warning = FALSE}
-rat.macro.md <- DS.macro.inf(rat.ds, num.modes = 2 , iters = 25, method = "mode") 
+rat.macro.md <- DS.macro.inf(rat.ds, num.modes = 2 , iters = 20, method = "mode") 
 ```
 ```{r}
 rat.macro.md
@@ -166,7 +166,7 @@ plot(arsn.ds, plot.type = "DSg", main = "DS vs g: Arsenic")
 **Step 4.** We now execute the macroinference to find a global estimate to summarize the $k = 28$ studies.
 
 ```{r, warning = FALSE}
-arsn.macro <- DS.macro.inf(arsn.ds, num.modes = 2, iters = 25, method = "mode")
+arsn.macro <- DS.macro.inf(arsn.ds, num.modes = 2, iters = 20, method = "mode")
 ```
 ```{r}
 arsn.macro
