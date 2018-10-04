@@ -58,7 +58,7 @@ plot(rat.ds, plot.type = "DSg", main = "DS vs g: Rat")
 **Step 4.** Here we are interested in the *overall* macro-level inference by combining the $k=70$ parallel studies. The group-specific modes along with their standard errors are computed as follows:
 
 ```{r, warning = FALSE}
-rat.macro.md <- DS.macro.inf(rat.ds, num.modes = 2 , iters = 20, method = "mode") 
+rat.macro.md <- DS.macro.inf(rat.ds, num.modes = 2 , iters = 15, method = "mode") 
 ```
 ```{r}
 rat.macro.md
@@ -78,6 +78,19 @@ rat.y71.micro
 ```
 ```{r,fig.height = 5.5, fig.width = 5.5,fig.align = 'center' }
 plot(rat.y71.micro, main = "Rat (4,14)")
+```
+
+###Finite Bayes
+
+The previous microinferece step ignores the randomness in the estimated hyperparameters (see step 3a).  To take into account this extra variability (of the hyperparameter estimates in our DS(G,m) model) we perform finite Bayes adjustment to our microinference for $\theta_{71}$. We also report the 90\% Bayesian credible interval based on the finite-sample "corrected" posterior of $\theta_{71}$.
+
+```{r, fig.align = 'center'}
+rat.y71.FB <- DS.Finite.Bayes(rat.ds, y.0 = 4, n.0 = 14, iters = 15)
+rat.y71.FB
+```
+```{r,fig.height = 5.5, fig.width = 5.5,fig.align = 'center' }
+plot(rat.y71.FB, xlim = c(0,.5), ylim = c(0, 9))
+legend("topright", c("DS Post", "DS Finite Bayes Post", "Parametric Post"), col = c("red", "darkgreen", "blue"), lty = c("solid","solid","dashed"), cex = 1)
 ```
 
 ##II. Comparison of $\mathcal{L}^2$ and maximum entropy representations using galaxy data (Normal Family)

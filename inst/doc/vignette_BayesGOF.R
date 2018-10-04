@@ -18,7 +18,7 @@ rat.ds
 plot(rat.ds, plot.type = "DSg", main = "DS vs g: Rat")
 
 ## ---- warning = FALSE----------------------------------------------------
-rat.macro.md <- DS.macro.inf(rat.ds, num.modes = 2 , iters = 20, method = "mode") 
+rat.macro.md <- DS.macro.inf(rat.ds, num.modes = 2 , iters = 15, method = "mode") 
 
 ## ------------------------------------------------------------------------
 rat.macro.md
@@ -33,6 +33,14 @@ rat.y71.micro
 
 ## ----fig.height = 5.5, fig.width = 5.5,fig.align = 'center'--------------
 plot(rat.y71.micro, main = "Rat (4,14)")
+
+## ---- fig.align = 'center'-----------------------------------------------
+rat.y71.FB <- DS.Finite.Bayes(rat.ds, y.0 = 4, n.0 = 14, iters = 15)
+rat.y71.FB
+
+## ----fig.height = 5.5, fig.width = 5.5,fig.align = 'center'--------------
+plot(rat.y71.FB, xlim = c(0,.5), ylim = c(0, 9))
+legend("topright", c("DS Post", "DS Finite Bayes Post", "Parametric Post"), col = c("red", "darkgreen", "blue"), lty = c("solid","solid","dashed"), cex = 1)
 
 ## ------------------------------------------------------------------------
 data(galaxy)

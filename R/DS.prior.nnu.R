@@ -7,7 +7,7 @@ function(yn.df, max.m = 8, start.par, iter.c = 200,
 			lambda.i <- function(s.i, tau.2){s.i^2/(s.i^2+tau.2)}
 			#PEB g
 			theta.vals <- seq(start.par[1] - 3*sqrt(start.par[2]),
-						start.par[1] + 3*sqrt(start.par[2]), length.out = 1000)
+						start.par[1] + 3*sqrt(start.par[2]), length.out = B)
 			PEB.g <- dnorm(theta.vals, start.par[1], sd = sqrt(start.par[2]))
 			u.grid <- pnorm(theta.vals, start.par[1], sd= sqrt(start.par[2])) #test
 			#u.grid <- seq(0,1, length.out = B)

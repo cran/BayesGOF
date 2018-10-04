@@ -42,7 +42,7 @@ DS.macro.inf(DS.GF.obj, num.modes = 1,
 
   }
 \references{
-Mukhopadhyay, S. and Fletcher, D., 2018. "Generalized Empirical Bayes via Frequentist Goodness of Fit," Technical report, \emph{Scientific Reports}, 8(1), p.9983, \url{https://www.nature.com/articles/s41598-018-28130-5 }.}
+Mukhopadhyay, S. and Fletcher, D., 2018. "Generalized Empirical Bayes via Frequentist Goodness of Fit," \emph{Nature Scientific Reports}, 8(1), p.9983, \url{https://www.nature.com/articles/s41598-018-28130-5 }.}
 \author{Doug Fletcher, Subhadeep Mukhopadhyay}
 \examples{
 \dontrun{

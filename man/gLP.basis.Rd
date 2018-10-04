@@ -17,7 +17,8 @@ gLP.basis(x, g.par, m, con.prior, ind)
 }
 \value{ Matrix with \code{m} columns of values for the LP-Basis functions evaluated at \code{x}-values.}
 \references{
-Mukhopadhyay, S. and Fletcher, D., 2018. "Generalized Empirical Bayes via Frequentist Goodness of Fit," Technical report, \emph{Scientific Reports}, 8(1), p.9983, \url{https://www.nature.com/articles/s41598-018-28130-5 }.
+Mukhopadhyay, S. and Fletcher, D., 2018. "Generalized Empirical Bayes via Frequentist Goodness of Fit," \emph{Nature Scientific Reports}, 8(1), p.9983, \url{https://www.nature.com/articles/s41598-018-28130-5 }.
+
 Mukhopadhyay, S., 2017. "Large-Scale Mode Identification and Data-Driven Sciences," \emph{Electronic Journal of Statistics, 11}(1), pp.215-240.
 
 Mukhopadhyay, S. and Parzen, E., 2014. "LP Approach to Statistical Modeling," arXiv: 1405.2601.

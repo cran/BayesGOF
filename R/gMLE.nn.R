@@ -1,5 +1,5 @@
 gMLE.nn <- 
-function(value, se, fixed = FALSE, method = c("DL","REML","MoM")){
+function(value, se, fixed = FALSE, method = c("DL","SJ","REML","MoM")){
 		### Univariate meta-analysis combiner function 
 		### Input is 2 vectors of length k (where k is number of partitions)  
 		### 	1) value is the vector of predicted values for a specified test value
@@ -23,6 +23,16 @@ function(value, se, fixed = FALSE, method = c("DL","REML","MoM")){
 		switch(method, 
 			"DL" = { out$tau.sq <- tau.sq.DL
 				   hv.weight <- 1/ (out$tau.sq + var.v)
+				   out$mu.hat <- (hv.weight %*% value) / sum (hv.weight)
+				   out$estimate <- c(out$mu.hat, out$tau.sq)
+				   out$method <- method
+			},
+			"SJ" = { tau.not <- mean( (value - mean(value))^2)
+					r.hat.i <- var.v / tau.not
+					v.hat.i <- r.hat.i + 1
+					theta.hat.v.hat <- sum(value/v.hat.i)/ sum(1/v.hat.i)
+					out$tau.sq <- sum((value - theta.hat.v.hat)^2/v.hat.i)/(nn1 - 1)
+					hv.weight <- 1/ (out$tau.sq + var.v)
 				   out$mu.hat <- (hv.weight %*% value) / sum (hv.weight)
 				   out$estimate <- c(out$mu.hat, out$tau.sq)
 				   out$method <- method

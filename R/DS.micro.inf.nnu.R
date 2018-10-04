@@ -31,9 +31,9 @@ function(DS.GF.obj, y.0, se.0){
 		out$post.fit <- data.frame(theta.vals = theta.conv,
 							   parm.pos = PEB.pos.den,
 							   ds.pos = LP.pos.den)
-		out$post.mean <- sintegral(DS.GF.obj$UF.data$UF.x,
+		out$DS.mean <- sintegral(DS.GF.obj$UF.data$UF.x,
 				   theta.conv*DS.GF.obj$UF.data$UF.y*wght.den)$int / denom #in terms of u
-		out$post.mode <- out$post.fit$theta.vals[which.max(out$post.fit$ds.pos)]
+		out$DS.mode <- out$post.fit$theta.vals[which.max(out$post.fit$ds.pos)]
 		out$post.vec <- c(out$PEB.mean, out$DS.mean, out$PEB.mode, out$DS.mode)
 		out$study <- c(y.0, se.0)
 		}
