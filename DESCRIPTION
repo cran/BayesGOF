@@ -1,7 +1,7 @@
 Package: BayesGOF
 Type: Package
-Title: Bayesian Modeling via Goodness-of-Fit
-Version: 5.0
+Title: Bayesian Modeling via Frequentist Goodness-of-Fit
+Version: 5.1
 Date: 2018-10-02
 Author: Subhadeep Mukhopadhyay, Douglas Fletcher
 Maintainer: Doug Fletcher <tug25070@temple.edu>
@@ -11,6 +11,6 @@ Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
 License: GPL-2
 NeedsCompilation: no
-Packaged: 2018-10-03 23:59:37 UTC; dougf
+Packaged: 2018-10-05 02:05:30 UTC; dougf
 Repository: CRAN
-Date/Publication: 2018-10-04 04:20:09 UTC
+Date/Publication: 2018-10-05 11:42:13 UTC

@@ -1,4 +1,4 @@
-d2b97fac75bd8aa392c42de214c35173 *DESCRIPTION
+8a7b4df223b7ee7ab182cc123ab32cb1 *DESCRIPTION
 52559619c64eec043eaaa899cecda3ca *NAMESPACE
 ccd5c23060acba72444a0cc37f74194c *R/DS.Finite.Bayes.R
 12cb9a250b0071f90d7e19bf46613c8d *R/DS.entropy.R
@@ -14,9 +14,9 @@ aa24ad8741a6ba4c4eca3f2ba01cebdc *R/DS.micro.inf.pge.R
 97538e692a7315cc3ecd0fde275abf99 *R/DS.micro.inf.pgu.R
 e22c5c33d68f33aabf8e2137a5b77a3f *R/DS.posterior.reduce.R
 08f26b9505bb67421745306cf671137c *R/DS.prior.R
-bc48ea505efbdb75f898445c60933123 *R/DS.prior.bbu.R
-821d3c7edfd0a3e92af089ac03ab306b *R/DS.prior.nnu.R
-89ad46bbdcfdefb3cf48a6a97802b71b *R/DS.prior.pgu.R
+acb882ae35a53ce885e5922827374171 *R/DS.prior.bbu.R
+3969642a564e72b52a3c17075f64b0af *R/DS.prior.nnu.R
+272b8180925c894347e853b046e67e78 *R/DS.prior.pgu.R
 8ecb1cd6f134d875aed32b4c305ad25b *R/DS.sampler.R
 f95fb8a7a0b7deb760b9bcb9c9a5160b *R/DS.sampler.post.R
 2862150d31488fa85ca108ce9b9409c5 *R/EXP.score.R
@@ -41,7 +41,7 @@ cef07eb0c6cd10c281f5b987d8390d08 *R/plot.DS_GF_micro.R
 3761a595aa4959da50466638f0ae4144 *R/print.DS_GF_micro.R
 fd8df5d7338962f7e53c178832de3972 *R/rPPD.ds.R
 bcff739ac82f9217249a066142b3cba1 *R/weight.fun.univ.R
-a67350f97dab560408f0345f0f538823 *build/partial.rdb
+5cdec262f92192492754418c6e498869 *build/partial.rdb
 fdc0c3b81464efa67ff2789177a3db3a *build/vignette.rds
 2235da02896248caee37a6bfd8f1675e *data/AutoIns.rda
 890414d6043ab45f0fc2d487c774eb93 *data/ChildIll.rda
@@ -58,7 +58,7 @@ d5e17a0af9b0f694d178a824213f7f04 *data/terb.rda
 cc1812eb703a57cffe97326febc8574e *data/ulcer.rda
 3005084f4f4fbdcdf8ed301f8a986e29 *inst/doc/vignette_BayesGOF.R
 5e3d3ae72affb9f5a2b0e079408ac310 *inst/doc/vignette_BayesGOF.Rmd
-6a70bcd127ddd4c1ef70f856f43e95ed *inst/doc/vignette_BayesGOF.html
+13ab9877ca56f35f3c14a1cf56e9b0c4 *inst/doc/vignette_BayesGOF.html
 c30e5b6c12cd7c5ea1e61447150c0a28 *man/AutoIns.Rd
 e013a6292e956b5a5ba38b50185246eb *man/BayesGOF-package.Rd
 88e9ed138513646c3fa94f0b5b92fe04 *man/ChildIll.Rd

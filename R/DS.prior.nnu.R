@@ -101,10 +101,11 @@ function(yn.df, max.m = 8, start.par, iter.c = 200,
 				DS.sm <- PEB.g*d.G
 				DS.sm[DS.sm<0]<-0.0000000001
 				d.u[d.u<0] <- 0.0000000001
+				area <- sintegral(u.grid, d.u)$int
 				out$prior.fit <- data.frame(theta.vals = theta.vals,
 											 parm.prior = PEB.g,
-											 ds.prior = DS.sm)
-				out$UF.data <- data.frame(UF.x = u.grid, UF.y = d.u)
+											 ds.prior = DS.sm/area)
+				out$UF.data <- data.frame(UF.x = u.grid, UF.y = d.u/area)
 				out$obs.data <- data.frame(y = yn.df[,1], se = yn.df[,2])
 				out$fam <- fam
 				if(LP.type == "L2"){
