@@ -23,7 +23,7 @@ DS.Finite.Bayes(DS.GF.obj, y.0, n.0 = NULL,
 
 \value{
   \item{prior.fit}{Fitted values for the estimated parametric, DS, and finite Bayes prior distributions.}
-  \item{post.fit}{Dataframe with \eqn{\theta}, \eqn{\pi_G(\theta)}, \eqn{\hat{\pi}_{LP}(\theta)}, and the finite Bayes posterior.}
+  \item{post.fit}{Dataframe with \eqn{\theta}, \eqn{\pi_G(\theta | y_0)}, and \eqn{\pi_{LP}(\theta | y_0)}.}  
   \item{interval}{The \code{100*cred.interval}\% Bayesian credible interval for the posterior mean.}
   \item{post.vec}{Vector containing the PEB posterior mean (\code{PEB.mean}), DS posterior mean (\code{DS.mean}), PEB posterior mode (\code{PEB.mode}), and the DS posterior mode (\code{DS.mode}).}
   

@@ -38,5 +38,7 @@ function(DS.GF.obj, y.0, se.0){
 		out$study <- c(y.0, se.0)
 		}
 	class(out) <- "DS_GF_micro"
+	names(out$post.vec) <- c("PEB_MN", "DS_MN", "PEB_MD", "DS_MD")
+	names(out$PEB.mean) <- NULL; names(out$PEB.mode) <- NULL; names(out$DS.mean) <- NULL; names(out$DS.mode) <- NULL
 	return(out)
 }

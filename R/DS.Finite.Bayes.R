@@ -100,7 +100,7 @@ function(DS.GF.obj, y.0, n.0 = NULL, cred.interval = 0.90, iters = 25){
 	fam = DS.GF.obj$fam
 	LP.type = DS.GF.obj$LP.type
 	DS.objt.list <- list()
-	DS.post.list <- list()
+	#DS.post.list <- list()
 	switch(fam,
 		"Normal" = {
 		out$study <- c(y.0, n.0)
@@ -252,16 +252,22 @@ function(DS.GF.obj, y.0, n.0 = NULL, cred.interval = 0.90, iters = 25){
 			finite.prior[i,] <- DS.objt.list[[i]]$prior.fit$ds.prior
 			}
 		}
-	out$prior.fit <- data.frame(theta.vals = DS.GF.obj$prior.fit$theta.vals,
+	if(sum(DS.GF.obj$LP.par^2) == 0){
+			out$prior.fit <- data.frame(theta.vals = DS.GF.obj$prior.fit$theta.vals,
+									parm.prior = DS.GF.obj$prior.fit$parm.prior,
+									finite.prior = colMeans(finite.prior)
+									)
+			} else {
+			out$prior.fit <- data.frame(theta.vals = DS.GF.obj$prior.fit$theta.vals,
 									parm.prior = DS.GF.obj$prior.fit$parm.prior,
 									ds.prior = DS.GF.obj$prior.fit$ds.prior,
 									finite.prior = colMeans(finite.prior)
 									)
-	#build posterior
+			}
+		#build posterior
 	post.base <- DS.micro.inf(DS.GF.obj, y.0= y.0, n.0 = n.0)
 	theta.post <- post.base$post.fit$theta.vals
-	out$post.vec <- post.base$post.vec
-	test.post <- sapply(DS.objt.list, function(x) LP.post.conv(theta.post, x, y.0 = y.0, n.0 = n.0) )
+	test.post <- lapply(DS.objt.list, function(x) LP.post.conv(theta.post, x, y.0 = y.0, n.0 = n.0) )
 	finite.post <- matrix(0, nrow = length(DS.objt.list), ncol = length(post.base$post.fit$theta.vals))
 	for(i in 1:length(DS.objt.list)){
 		if(dim(test.post[[i]])[2] == 2){
@@ -271,10 +277,21 @@ function(DS.GF.obj, y.0, n.0 = NULL, cred.interval = 0.90, iters = 25){
 			}
 		}
 	finite.post[which(finite.post < 0)] <- 0.00001
-	out$post.fit <- data.frame(theta.vals = post.base$post.fit$theta.vals,
+	if(dim(post.base$post.fit)[2] == 2){
+			out$post.fit <- data.frame(theta.vals = post.base$post.fit$theta.vals,
+							   parm.post = post.base$post.fit$parm.pos,
+							   finite.post =  colMeans(finite.post))
+			} else {
+			out$post.fit <- data.frame(theta.vals = post.base$post.fit$theta.vals,
 							   parm.post = post.base$post.fit$parm.pos,
 							   ds.post = post.base$post.fit$ds.pos,
 							   finite.post =  colMeans(finite.post))
+			}
+	out$post.vec <- c(post.base$post.vec[1],
+					  DS_MN = sintegral(out$post.fit$theta.vals, out$post.fit$theta.vals*out$post.fit$finite.post)$int,
+					  post.base$post.vec[3],
+					  DS_MD = out$post.fit$theta.vals[which.max(out$post.fit$finite.post)])
+					  
 	#credible interval
 	dens.vec <- NULL
 	for(i in 2:length(post.base$post.fit$theta.vals)){

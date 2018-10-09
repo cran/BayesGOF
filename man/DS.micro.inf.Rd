@@ -23,13 +23,13 @@ DS.micro.inf(DS.GF.obj, y.0, n.0, e.0 = NULL)
   }
 \details{Returns an object of class \code{DS.GF.micro} that can be used in conjunction with plot command to display the DS posterior distribution for the new study.}
 \value{
-  \item{DS.mean}{Posterior mean for \eqn{\pi_{LP}(\theta | y_0,n_0)}.}
-  \item{DS.mode}{Posterior mode for \eqn{\pi_{LP}(\theta | y_0,n_0)}.}
-  \item{PEB.mean}{Posterior mean for \eqn{\pi_G(\theta | y_0,n_0)}.}
-  \item{PEB.mode}{Posterior mode for \eqn{\pi_G(\theta | y_0,n_0)}.}
+  \item{DS.mean}{Posterior mean for \eqn{\pi_{LP}(\theta | y_0)}.}
+  \item{DS.mode}{Posterior mode for \eqn{\pi_{LP}(\theta | y_0)}.}
+  \item{PEB.mean}{Posterior mean for \eqn{\pi_G(\theta | y_0)}.}
+  \item{PEB.mode}{Posterior mode for \eqn{\pi_G(\theta | y_0)}.}
   \item{post.vec}{Vector containing \code{PEB.mean}, \code{DS.mean}, \code{PEB.mode}, and \code{DS.mode}.}
   \item{study}{User-provided \eqn{y_0} and \eqn{n_0}.}
-  \item{post.fit}{Dataframe with \eqn{\theta}, \eqn{\pi_G(\theta)}, and \eqn{\hat{\pi}_{LP}(\theta)}.}
+  \item{post.fit}{Dataframe with \eqn{\theta}, \eqn{\pi_G(\theta | y_0)}, and \eqn{\pi_{LP}(\theta | y_0)}.}
 
   }
 \references{

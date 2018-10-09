@@ -1,19 +1,19 @@
 ---
-title: "Bayes via Goodness of Fit"
+title: "Bayesian Modeling via Frequentist Goodness-of-Fit"
 author: Subhadeep Mukhopadhyay and Douglas Fletcher
 output: 
   rmarkdown::html_vignette:
     toc: true
 vignette: >
-  %\VignetteIndexEntry{Bayes via Goodness of Fit}
+  %\VignetteIndexEntry{Bayesian Modeling via Frequentist Goodness-of-Fit}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
 
-##I. Illustration using rat tumor data (Binomial Family)
+## I. Illustration using rat tumor data (Binomial Family)
 The rat tumor data consists of observations of endometrial stromal polyp incidence in $k=70$ groups of rats.  For each group, $y_i$ is the number of rats with polyps and $n_i$ is the total number of rats in the experiment.  Here we describe the analysis of rat tumor data using Bayes-${\rm DS}(G,m)$ modeling.  
 
-###Pre-Inferential Modeling
+### Pre-Inferential Modeling
 
 **Step 1.** We begin by finding the starting parameter values for $g \sim Beta(\alpha, \beta)$ by MLE:
 
@@ -53,7 +53,7 @@ Therefore, the DS prior $\widehat{\pi}$ given $g$ is: $$\widehat{\pi}(\theta) = 
 plot(rat.ds, plot.type = "DSg", main = "DS vs g: Rat")
 ```
 
-###MacroInference
+### MacroInference
 
 **Step 4.** Here we are interested in the *overall* macro-level inference by combining the $k=70$ parallel studies. The group-specific modes along with their standard errors are computed as follows:
 
@@ -68,7 +68,7 @@ rat.macro.md
 plot(rat.macro.md, main = "MacroInference: Rat")
 ```
 
-###MicroInference
+### MicroInference
 
 **Step 5.** Given an additional study $\theta_{71}$ where $y_{71} = 4$ and $n_{71} = 14$, the goal is to estimate the probability of a tumor for this new clinical study. The following code performs the desired microinference to find the posterior distribution $\pi_{LP}(\theta_{71}|y_{71},n_{71})$ along with its mean and mode:
 
@@ -80,7 +80,7 @@ rat.y71.micro
 plot(rat.y71.micro, main = "Rat (4,14)")
 ```
 
-###Finite Bayes
+### Finite Bayes
 
 The previous microinferece step ignores the randomness in the estimated hyperparameters (see step 3a).  To take into account this extra variability (of the hyperparameter estimates in our DS(G,m) model) we perform finite Bayes adjustment to our microinference for $\theta_{71}$. We also report the 90\% Bayesian credible interval based on the finite-sample "corrected" posterior of $\theta_{71}$.
 
@@ -93,7 +93,7 @@ plot(rat.y71.FB, xlim = c(0,.5), ylim = c(0, 9))
 legend("topright", c("DS Post", "DS Finite Bayes Post", "Parametric Post"), col = c("red", "darkgreen", "blue"), lty = c("solid","solid","dashed"), cex = 1)
 ```
 
-##II. Comparison of $\mathcal{L}^2$ and maximum entropy representations using galaxy data (Normal Family)
+## II. Comparison of $\mathcal{L}^2$ and maximum entropy representations using galaxy data (Normal Family)
 
 This demonstration will compare the results using the default $\mathcal{L}^2$ representation of the estimated DS prior $\widehat{\pi}$ to the maximum entropy $\breve{\pi}$ representation.  We will use the galaxy data, which consists of $k=324$ observed rotation velocities $y_i$ and their uncertainties of Low Surface Brightness (LSB) galaxies.
 
@@ -137,11 +137,11 @@ The DS prior in its $\mathcal{L}^2$ representation is: $$\widehat{\pi}(\theta) =
 
 The DS prior in its maximum entropy representation is: $$\breve{\pi}(\theta) = g(\theta; \mu, \tau^2)\exp\Big[-0.15 + 0.26T_3(\theta;G)-0.28T_4(\theta;G)+0.46T_5(\theta;G)\Big] $$
 
-##III. Illustration using arsenic data (Normal Family)
+## III. Illustration using arsenic data (Normal Family)
 
 For this example, we will focus on the macroinference for the arsenic data set.  The arsenic data set details the measurements of the level of arsenic in oyster tissue from $k=28$ laboratories.  We will use the maximum entropy representation for this example.
 
-###Pre-Inferential Modeling
+### Pre-Inferential Modeling
 
 **Step 1.** We begin by finding the starting parameter values for $g \sim Normal(\mu, \tau^2)$ by MLE:
 
@@ -174,7 +174,7 @@ The resulting equation for $\breve{\pi}(\theta)$ is: $$\breve{\pi}(\theta) = g(\
 plot(arsn.ds, plot.type = "DSg", main = "DS vs g: Arsenic")
 ```
 
-###MacroInference
+### MacroInference
 
 **Step 4.** We now execute the macroinference to find a global estimate to summarize the $k = 28$ studies.
 
@@ -205,11 +205,11 @@ par(mar=c(5,5.2,4,2)+0.3) #changes left margin to make large labels fit
 
 The plot shows the dominant mode and our consensus value for the measurand is 13.6 with a standard error (using smooth bootstrap) of 0.25.  This mode is resistant to any extreme low measurements and achieves a slightly more accurate result than the standard PEB estimate ($13.22 \pm 0.25$). 
 
-##IV. Illustration using child illness data (Poisson Family)
+## IV. Illustration using child illness data (Poisson Family)
 
 The next example will conduct microinference on the child illness data. The child illness data comes from a study where researchers followed $k=602$ pre-school children in north-east Thailand, recording the number of times ($y_i$) a child became sick during every 2-week period for over three years.  In particular, we want to compare posterior distributions for the number of children who became sick 1, 3, 5, and 10 times during a two week period.  We will use the $\mathcal{L}^2$ representation for this example.
 
-###Pre-Inferential Modeling
+### Pre-Inferential Modeling
 
 **Step 1.** We begin by finding the starting parameter values for $g \sim Gamma(\alpha, \beta)$ by MLE:
 
@@ -243,7 +243,7 @@ We can plot $\widehat{\pi}$, along with $g$:
 plot(child.ds, plot.type = "DSg", main = "DS vs. g: Child Illness Data")
 ```
 
-###MicroInference
+### MicroInference
 
 **Step 4.** The plot shows some very interesting behavior in $\widehat{\pi}$.  We want to explore the posterior distributions for $y = 1,3,5,10$.  For those results, we use the microinference functions.
 
